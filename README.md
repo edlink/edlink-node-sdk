@@ -1,3 +1,12 @@
+# Edlink Node SDK
+This Edlink JavaScript & TypeScript SDK is a NodeJS wrapper for the Edlink API.
+
+# Get Started
+## Install
+Install the `edlink` package using `npm` or `yarn`.
+```
+yarn add edlink
+```
 ```typescript
 // Initialize with your Edlink application
 // Your credentials can be found on the Edlink Dashboard
@@ -11,6 +20,7 @@ const edlink = new Edlink({
 
 Edlink.up().then(console.log); // true
 ```
+## Authorization
 
 ```typescript
 // TokenSets are required to access protected resources
@@ -25,6 +35,25 @@ export type TokenSet {
     token_type: 'Bearer';
 }
 ```
+
+## Graph API
+
+```typescript
+// Graph requests are even easier, just build a TokenSet from the values
+// in the Edlink Dashboard
+
+const integration_token_set = {
+    access_token: '[...]'
+}
+
+const district = await edlink.use(token_set).graph.districts.fetch('[...]');
+
+for await (const district of edlink.use(token_set).graph.districts.list()) {
+    console.log(district)
+}
+```
+
+## User Authentication
 
 ```typescript
 // Authenticate a user
@@ -46,10 +75,10 @@ edlink.login_url({redirect_uri: 'https://oauthdebugger.com/debug'});
 ```typescript
 // When the user returns to your site you will be provided with a code
 // e.g. https://oauthdebugger.com/debug?code=[...]
-// Provide this code with the matching `redirect_uri` to recieve an `access_token`
+// Provide this code with the matching `redirect_uri` to recieve a token set
 
 // Store this entire object securely
-// Edlink will require more than just the access_token
+// You will require more than just the access_token
 const person_token_set = await edlink.auth.grant(
     '[...]',
     { redirect_uri: 'https://oauthdebugger.com/debug' }
@@ -59,20 +88,7 @@ const person_token_set = await edlink.auth.grant(
 const profile = await edlink.use(person_token_set).user.my.profile();
 ```
 
-```typescript
-// Graph requests are even easier, just build a TokenSet from the values
-// in the Edlink Dashboard
-
-const integration_token_set = {
-    access_token: '[...]'
-}
-
-const district = await edlink.use(token_set).graph.districts.fetch('[...]');
-
-for await (const district of edlink.use(token_set).graph.districts.list()) {
-    console.log(district)
-}
-```
+## Notes
 
 ```typescript
 // DEPENDENCY ORDER

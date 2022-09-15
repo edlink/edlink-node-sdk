@@ -1,4 +1,4 @@
-const Edlink = require('../dist/index.js').Edlink;
+const { Edlink } = require('../dist/index.js');
 const access_token = 'DqJcD7jjAUtfbcWslmAzqDc8NurwnStk';
 const edlink = new Edlink({
     version: 2,
