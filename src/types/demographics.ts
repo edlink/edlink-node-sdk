@@ -19,7 +19,7 @@ export interface Demographics {
      */
     gender: Gender;
     /**
-     * [Public Schoo Residence Status Enum](https://ed.link/docs/api/v2.0/models/external/enums/public-school-residence-status)
+     * [Public School Residence Status Enum](https://ed.link/docs/api/v2.0/models/external/enums/public-school-residence-status)
      * @type {string}
      * @memberof Demographics
      */
