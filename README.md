@@ -18,7 +18,7 @@ const edlink = new Edlink({
     client_secret: '[...]'
 });
 
-Edlink.up().then(console.log); // true
+Edlink.up().then(console.log); // Ok
 ```
 ## Authorization
 
