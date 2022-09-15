@@ -1,4 +1,4 @@
-# Edlink Node SDK
+# Edlink Node SDK [![CI](https://github.com/edlink/edlink-node-sdk/actions/workflows/analyze.yml/badge.svg)](https://github.com/edlink/edlink-node-sdk/actions/workflows/analyze.yml)
 This Edlink JavaScript & TypeScript SDK is a NodeJS wrapper for the Edlink API.
 
 # Get Started
