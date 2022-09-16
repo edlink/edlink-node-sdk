@@ -14,3 +14,5 @@ export * from './section';
 export * from './session';
 export * from './assignment';
 export * from './category';
+export * from './submission';
+export * from './attachment';

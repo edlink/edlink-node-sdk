@@ -1,9 +1,5 @@
 import { Edlink } from '..';
-import { Agents } from '../common/agents';
-import { Classes } from '../common/classes';
-import { Districts } from '../common/districts';
-import { Schools } from '../common/schools';
-import { Sections } from '../common/sections';
+import { Agents, Assignments, Categories, Classes, Districts, Schools, Sections, Submissions } from '../common';
 import { BearerTokenAPI, TokenSet } from '../types';
 import { My } from './my';
 
@@ -14,6 +10,9 @@ export class User extends BearerTokenAPI {
     public classes: Classes;
     public sections: Sections;
     public agents: Agents;
+    public categories: Categories;
+    public assignments: Assignments;
+    public submissions: Submissions;
 
     constructor(edlink: Edlink, token_set: TokenSet) {
         super(edlink, token_set);
@@ -32,5 +31,8 @@ export class User extends BearerTokenAPI {
         this.classes = new Classes(this);
         this.sections = new Sections(this);
         this.agents = new Agents(this);
+        this.categories = new Categories(this);
+        this.assignments = new Assignments(this);
+        this.submissions = new Submissions(this);
     }
 }

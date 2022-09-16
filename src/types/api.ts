@@ -44,6 +44,7 @@ export class BearerTokenAPI {
         // Make request
         const response = await this.axios.request(config).catch(error => {
             // TODO: Some custom error handling?
+            console.log(error.response.data);
             throw error;
         });
         return raw ? response.data : response.data.$data;
