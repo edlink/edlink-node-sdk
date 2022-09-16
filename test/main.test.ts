@@ -170,15 +170,6 @@ describe('Graph', () => {
         console.log('class/enrollment', Array.from(data.entries())[0]);
     });
 
-    // it('/api/v2/graph/classes/:class_id/assignments', async () => {
-    //     const data: Map<string, Assignment> = new Map();
-    //     for await (const assignment of edlink.use(token_set).classes.listAssignments('3e6fd159-0c1a-42ae-9b75-334d789b8d20')) {
-    //         data.set(assignment.id, assignment);
-    //     }
-    //     console.log(data.entries());
-    //     edlink.use(token_set).classes.createAssignment('3e6fd159-0c1a-42ae-9b75-334d789b8d20', { name: 'Test Assignment', description: 'This is a test assignment', due_date: new Date() });
-    // });
-
     // Sections
 
     it('/api/v2/graph/sections', async () => {
