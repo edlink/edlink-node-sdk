@@ -296,13 +296,13 @@ describe('Graph', () => {
     // Agents
     // TODO: Need a source with agents
 
-    // it('/api/v2/graph/agents', async () => {
-    //     const data: Map<string, Agent> = new Map();
-    //     for await (const agent of edlink.use(token_set).agents.list()) {
-    //         data.set(agent.id, agent);
-    //     }
-    //     console.log('agent', Array.from(data.entries())[0]);
-    // });
+    it('/api/v2/graph/agents', async () => {
+        const data: Map<string, Agent> = new Map();
+        for await (const agent of edlink.use(token_set).agents.list()) {
+            data.set(agent.id, agent);
+        }
+        console.log('agent', Array.from(data.entries())[0]);
+    });
 
     // it('/api/v2/graph/agents/:agent_id', async () => {
     //     for await (const agent of edlink.use(token_set).agents.list({ limit: 1 })) {
