@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Edlink, Class, Section, Enrollment, Session, Course, Person, TokenSetType, IntegrationTokenSet } from '../src';
+import { Edlink, Class, Section, Enrollment, Session, Course, Person, TokenSetType, IntegrationTokenSet, Agent } from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;
 
@@ -277,5 +277,39 @@ describe('Graph', () => {
 
     // Enrollments
 
+    it('/api/v2/graph/enrollments', async () => {
+        const data: Map<string, Enrollment> = new Map();
+        for await (const enrollment of edlink.use(token_set).enrollments.list()) {
+            data.set(enrollment.id, enrollment);
+        }
+        console.log('enrollment', Array.from(data.entries())[0]);
+    });
+
+    it('/api/v2/graph/enrollments/:enrollment_id', async () => {
+        for await (const enrollment of edlink.use(token_set).enrollments.list({ limit: 1 })) {
+            const enrollment2 = await edlink.use(token_set).enrollments.fetch(enrollment.id);
+            expect(enrollment).toBeDefined();
+            expect(enrollment).toStrictEqual(enrollment2);
+        }
+    });
+
     // Agents
+    // TODO: Need a source with agents
+
+    // it('/api/v2/graph/agents', async () => {
+    //     const data: Map<string, Agent> = new Map();
+    //     for await (const agent of edlink.use(token_set).agents.list()) {
+    //         data.set(agent.id, agent);
+    //     }
+    //     console.log('agent', Array.from(data.entries())[0]);
+    // });
+
+    // it('/api/v2/graph/agents/:agent_id', async () => {
+    //     for await (const agent of edlink.use(token_set).agents.list({ limit: 1 })) {
+    //         const agent2 = await edlink.use(token_set).agents.fetch(agent.id);
+    //         expect(agent).toBeDefined();
+    //         expect(agent).toStrictEqual(agent2);
+    //     }
+    // });
+    
 });

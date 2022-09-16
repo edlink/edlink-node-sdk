@@ -7,7 +7,7 @@ export class Agents {
         yield* this.api.paginate<Agent>('/agents', options);
     }
 
-    fetch(district_id: string): Promise<Agent> {
-        return this.api.request(`/agents/${district_id}`);
+    fetch(agent_id: string): Promise<Agent> {
+        return this.api.request(`/agents/${agent_id}`);
     }
 }
