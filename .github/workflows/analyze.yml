@@ -1,5 +1,13 @@
 name: CI
-on: workflow_dispatch
+on: 
+  workflow_dispatch:
+    secrets:
+        CLIENT_SECRET:
+            required: true
+        INTEGRATION_ACCESS_TOKEN:
+            required: true
+        REFRESH_TOKEN:
+            required: true
 jobs:
   build:
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
@@ -27,6 +35,10 @@ jobs:
 
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
+        env:
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          INTEGRATION_ACCESS_TOKEN: ${{ secrets.INTEGRATION_ACCESS_TOKEN }}
+          REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
 
       - name: Build
         run: yarn build
