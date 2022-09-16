@@ -1,10 +1,24 @@
 import axios from 'axios';
 import { Graph } from './graph';
-import { TokenSet } from './types';
+import { IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
 import { User } from './user';
 import { Auth } from './user/auth';
 
-export { District, School, Session, Course, Class, Section, Person, Enrollment, Agent, TokenSet } from './types';
+export {
+    District,
+    School,
+    Session,
+    Course,
+    Class,
+    Section,
+    Person,
+    Enrollment,
+    Agent,
+    TokenSet,
+    PersonTokenSet,
+    IntegrationTokenSet,
+    TokenSetType
+} from './types';
 
 function serialize(object: Record<string, string | undefined | null>) {
     const str = [];
@@ -18,7 +32,7 @@ function serialize(object: Record<string, string | undefined | null>) {
     return str.join('&');
 }
 
-type EdlinkConfig = {
+export type EdlinkConfig = {
     version?: number;
     client_id: string;
     client_secret: string;
@@ -29,7 +43,7 @@ export class Edlink {
     client_id: string;
     client_secret: string;
 
-    auth: Auth;
+    public auth: Auth;
 
     constructor(config: EdlinkConfig) {
         Edlink.validate(config);
@@ -37,16 +51,20 @@ export class Edlink {
         this.version = config.version ?? 2;
         this.client_id = config.client_id;
         this.client_secret = config.client_secret;
-        // Buid API interfaces
+        // Build API interfaces
         this.auth = new Auth(this);
     }
 
-    public use = (token_set: TokenSet): { graph: Graph; user: User } => {
-        return {
-            graph: new Graph({ ...this, token_set }),
-            user: new User({ ...this, token_set })
-        };
-    };
+    public use(token_set: IntegrationTokenSet): Graph;
+    public use(token_set: PersonTokenSet): User;
+
+    public use(token_set: any): any {
+        if (token_set.type === TokenSetType.Person) {
+            return new User(this, token_set);
+        } else {
+            return new Graph(this, token_set);
+        }
+    }
 
     private static validate(config: EdlinkConfig) {
         // Do some simple validation
@@ -62,7 +80,7 @@ export class Edlink {
         return response.data;
     }
 
-    login_url({ redirect_uri, state }: { redirect_uri?: string; state?: string } = {}) {
+    loginUrl({ redirect_uri, state }: { redirect_uri?: string; state?: string } = {}) {
         const params = {
             client_id: this.client_id,
             redirect_uri: redirect_uri,

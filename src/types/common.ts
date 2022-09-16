@@ -2,7 +2,7 @@
  * @export
  * @enum {string}
  */
- export enum Subject {
+export enum Subject {
     // CEDS Subjects
     LanguageArts = 'CEDS.01', // EnglishLanguageAndLiterature in CEDS
     Mathematics = 'CEDS.02',
@@ -64,20 +64,20 @@ export enum GradeLevel {
 
 export interface Identifier {
     /**
-     * 
+     *
      * @type {string}
      * @memberof Identifier
      */
     type: string;
     /**
-     * 
+     *
      * @type {string}
      * @memberof Identifier
      */
     value: string;
 }
 
-// 
+//
 
 /**
  * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
@@ -114,7 +114,7 @@ export enum IdentifierType {
     OneRoster = 'oneroster_id',
     PowerSchool = 'powerschool_id',
     Schoology = 'schoology_id',
-    Skyward = 'skyward_id',
+    Skyward = 'skyward_id'
 }
 
 /**
@@ -143,7 +143,7 @@ export enum Race {
  * @export
  * @enum {string}
  */
- export enum Role {
+export enum Role {
     Student = 'student',
     DistrictAdministrator = 'district-administrator',
     Administrator = 'administrator',
@@ -157,13 +157,26 @@ export enum Race {
     Member = 'member'
 }
 
-export interface PersonTokenSet {
-    access_token: string;
-    refresh_token: string;
-    expires_in: number;
-    token_type: 'Bearer';
+export enum TokenSetType {
+    Integration = 'integration',
+    Person = 'person'
 }
 
 export type TokenSet = {
+    type: TokenSetType;
     access_token: string;
-} & Partial<PersonTokenSet>;
+    refresh_token?: string;
+    expiration_date?: Date;
+};
+
+export type PersonTokenSet = TokenSet & {
+    type: TokenSetType.Person;
+    access_token?: string;
+    refresh_token: string;
+    expiration_date?: Date;
+};
+
+export type IntegrationTokenSet = TokenSet & {
+    type: TokenSetType.Integration;
+    access_token: string;
+};

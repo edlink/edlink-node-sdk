@@ -14,7 +14,7 @@ import { Edlink } from 'edlink';
 
 const edlink = new Edlink({
     version: 2,
-    client_id: '[...]',
+    client_id: '3a95a779-0ed1-499b-a352-9ea30d0bd5ea',
     client_secret: '[...]'
 });
 
@@ -32,7 +32,12 @@ export type TokenSet {
     access_token: string;
     refresh_token?: string;
     expires_in?: number;
-    token_type: 'Bearer';
+    type: TokenSetType;
+}
+
+export enum TokenSetType = {
+    Integration = 'integration',
+    Person = 'person'
 }
 ```
 
@@ -46,9 +51,9 @@ const integration_token_set = {
     access_token: '[...]'
 }
 
-const district = await edlink.use(token_set).graph.districts.fetch('[...]');
+const district = await edlink.use(integration_token_set).districts.fetch('3a95a779-0ed1-499b-a352-9ea30d0bd5ea');
 
-for await (const district of edlink.use(token_set).graph.districts.list()) {
+for await (const district of edlink.use(integration_token_set).districts.list()) {
     console.log(district)
 }
 ```
@@ -69,7 +74,7 @@ for await (const district of edlink.use(token_set).graph.districts.list()) {
 // Optionally you may provide a state paramater for Endlink to
 // passback to you upon authentication of the user
 
-edlink.login_url({redirect_uri: 'https://oauthdebugger.com/debug'});
+edlink.loginUrl({redirect_uri: 'https://oauthdebugger.com/debug'});
 ```
 
 ```typescript
@@ -79,13 +84,13 @@ edlink.login_url({redirect_uri: 'https://oauthdebugger.com/debug'});
 
 // Store this entire object securely
 // You will require more than just the access_token
-const person_token_set = await edlink.auth.grant(
-    '[...]',
-    { redirect_uri: 'https://oauthdebugger.com/debug' }
-);
+const person_token_set = await edlink.auth.grant({
+    code: '[...]'.
+    redirect_uri: 'https://oauthdebugger.com/debug'
+});
 
 // You can now make requests on behalf of this user
-const profile = await edlink.use(person_token_set).user.my.profile();
+const profile = await edlink.use(person_token_set).my.profile();
 ```
 
 ## Notes
