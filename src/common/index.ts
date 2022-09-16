@@ -7,7 +7,6 @@ export { People } from './people';
 export { Schools } from './schools';
 export { Sections } from './sections';
 export { Sessions } from './sessions';
-
 export { Categories } from './categories';
 export { Assignments } from './assignments';
 export { Submissions } from './submissions';
