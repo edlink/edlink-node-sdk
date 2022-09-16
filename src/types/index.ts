@@ -13,3 +13,4 @@ export * from './school';
 export * from './section';
 export * from './session';
 export * from './assignment';
+export * from './category';

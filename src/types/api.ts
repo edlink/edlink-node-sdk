@@ -18,7 +18,7 @@ export class BearerTokenAPI {
         this.edlink = edlink;
     }
 
-    async request<T>(endpoint: string, config: AxiosRequestConfig, raw = false): Promise<T> {
+    async request<T>(endpoint: string, config: AxiosRequestConfig = {}, raw = false): Promise<T> {
         // Check if the token needs to be refreshed if this is a person token set.
         if (this.token_set.type === TokenSetType.Person && this.requiresTokenRefresh()) {
             // do the token refresh
@@ -51,14 +51,14 @@ export class BearerTokenAPI {
 
     async *paginate<T>(
         endpoint: string,
+        options: Record<string, any> = {},
         config: Record<string, any> = {},
-        limit?: number,
         until?: (item: T) => boolean,
         formatter?: (raw: any) => T
     ): AsyncGenerator<T> {
         let next = null;
         let data: T[] = [];
-        let remaining = limit;
+        let remaining = options.limit;
 
         do {
             const response: { $data: T[]; $next?: string } = await this.request(next ?? endpoint, config, true);

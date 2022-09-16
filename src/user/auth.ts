@@ -3,8 +3,8 @@ import { EdlinkConfig } from '..';
 import { PersonTokenSet, TokenSetType } from '../types';
 
 export class Auth {
-    api: AxiosStatic;
-    config: EdlinkConfig;
+    private api: AxiosStatic;
+    private config: EdlinkConfig;
 
     constructor(config: EdlinkConfig) {
         this.api = axios;

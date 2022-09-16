@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Edlink, Class, Section, Enrollment, Session, Course, Person, TokenSetType, IntegrationTokenSet, PersonTokenSet } from '../src';
+import { Edlink, Class, Section, Enrollment, Session, Course, Person, TokenSetType, IntegrationTokenSet } from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;
 
@@ -19,30 +19,27 @@ const edlink = new Edlink({
 // jest.setTimeout(10000);
 
 describe('User', () => {
-    it.only('auth', async () => {
-        // const grant = await edlink.auth.grant({
-        //     code: 'SdIsAsVPZRjmGaaBsZwFXdjMRRwyqPDu',
-        //     redirect_uri: 'https://oauthdebugger.com/debug'
-        // });
+    it('auth', async () => {
+        const grant = await edlink.auth.grant({
+            code: process.env.CODE!,
+            redirect_uri: 'https://oauthdebugger.com/debug'
+        });
         // console.log(grant);
 
-        // const refresh = await edlink.auth.refresh(grant.refresh_token);
+        const refresh = await edlink.auth.refresh(grant.refresh_token);
+        expect(refresh.access_token).toBeDefined();
         // console.log(refresh);
 
-        const grant: PersonTokenSet = {
-            access_token: 'c821e7864da77f29cef2191e18030e25652583cc93609599304101cffb7a584b',
-            refresh_token: '1153a18128ed6b2ecb92966cbe214d6e73c7687779f602917ce409b7c276c3bb8339e9c2a1867096ce0ea413978884f6bae06ec59c8b0462f4021aa532ea6338',
-            type: TokenSetType.Person,
+        for await (const _class of edlink.use(grant).classes.list({ limit: 1 })) {
+            // console.log(_class);
         }
-
-        // for await (const _class of edlink.use(grant).classes.list({ limit: 1 })) {
-        //     console.log(_class);
-        // }
 
         const profile = await edlink.use(grant).my.profile();
         const integration = await edlink.use(grant).my.integration();
-        console.log(profile);
-        console.log(integration);
+        expect(profile).toBeDefined();
+        expect(integration).toBeDefined();
+        // console.log(profile);
+        // console.log(integration);
     });
 });
 
