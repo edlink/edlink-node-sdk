@@ -1,12 +1,17 @@
 # Edlink Node SDK [![CI](https://github.com/edlink/edlink-node-sdk/actions/workflows/analyze.yml/badge.svg)](https://github.com/edlink/edlink-node-sdk/actions/workflows/analyze.yml)
+
 This Edlink JavaScript & TypeScript SDK is a NodeJS wrapper for the Edlink API.
 
 # Get Started
+
 ## Install
+
 Install the `edlink` package using `npm` or `yarn`.
+
 ```
 yarn add edlink
 ```
+
 ```typescript
 // Initialize with your Edlink application
 // Your credentials can be found on the Edlink Dashboard
@@ -20,6 +25,7 @@ const edlink = new Edlink({
 
 Edlink.up().then(console.log); // Ok
 ```
+
 ## Authorization
 
 ```typescript
@@ -49,12 +55,12 @@ export enum TokenSetType = {
 
 const integration_token_set = {
     access_token: '[...]'
-}
+};
 
 const district = await edlink.use(integration_token_set).districts.fetch('3a95a779-0ed1-499b-a352-9ea30d0bd5ea');
 
 for await (const district of edlink.use(integration_token_set).districts.list()) {
-    console.log(district)
+    console.log(district);
 }
 ```
 
@@ -71,10 +77,10 @@ for await (const district of edlink.use(integration_token_set).districts.list())
  * &state=[...]
  * &response_type=code
  */
-// Optionally you may provide a state paramater for Endlink to
+// Optionally you may provide a state parameter for Endlink to
 // passback to you upon authentication of the user
 
-edlink.loginUrl({redirect_uri: 'https://oauthdebugger.com/debug'});
+edlink.loginUrl({ redirect_uri: 'https://oauthdebugger.com/debug' });
 ```
 
 ```typescript

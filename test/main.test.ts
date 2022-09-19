@@ -53,7 +53,7 @@ describe('User', () => {
 describe('Graph', () => {
     it('/api/up', async () => {
         expect(await Edlink.up()).toBeTruthy();
-        console.log(edlink.loginUrl);
+        console.log(edlink.loginUrl({ redirect_uri: 'https://oauthdebugger.com/debug' }));
     });
 
     it('/api/v2/graph/classes', async () => {
@@ -75,6 +75,15 @@ describe('Graph', () => {
             const district = await edlink.use(token_set).districts.fetch(_district.id);
             expect(district).toBeDefined();
             expect(district).toStrictEqual(_district);
+        }
+    });
+
+    it('/api/v2/graph/districts/:district_id/administrators', async () => {
+        for await (const district of edlink.use(token_set).districts.list({ limit: 1 })) {
+            for await (const admin of edlink.use(token_set).districts.listAdministrators(district.id, { limit: 1 })) {
+                console.log('ADMIN HERE', admin);
+                expect(admin).toBeDefined();
+            }
         }
     });
 

@@ -4,14 +4,28 @@ import { BearerTokenAPI, Enrollment, Person } from '../types';
 export class Sections {
     constructor(private api: BearerTokenAPI) {}
 
+    /**
+     * Paginates through all sections.
+     * @param options Provide a `limit` for the max number of results
+     */
     async *list(options: { limit?: number;} = {}): AsyncGenerator<Section> {
         yield* this.api.paginate<Section>('/sections', options);
     }
 
+    /**
+     * Fetch a single section by ID.
+     * @param section_id The UUID of the section
+     * @returns 
+     */
     fetch(section_id: string): Promise<Section> {
         return this.api.request(`/sections/${section_id}`);
     }
 
+    /**
+     * Paginates through all enrollments in a section.
+     * @param section_id The UUID of the section
+     * @param options Provide a `limit` for the max number of results
+     */
     async *listEnrollments(
         section_id: string,
         options: { limit?: number;} = {}
@@ -19,6 +33,11 @@ export class Sections {
         yield* this.api.paginate<Enrollment>(`/sections/${section_id}/enrollments`, options);
     }
 
+    /**
+     * Paginates through all people in a section.
+     * @param section_id The UUID of the section
+     * @param options Provide a `limit` for the max number of results
+     */
     async *listPeople(
         section_id: string,
         options: { limit?: number;} = {}
@@ -26,6 +45,11 @@ export class Sections {
         yield* this.api.paginate<Person>(`/sections/${section_id}/people`, options);
     }
 
+    /**
+     * Paginates through all teachers in a section.
+     * @param section_id The UUID of the section
+     * @param options Provide a `limit` for the max number of results
+     */
     async *listTeachers(
         section_id: string,
         options: { limit?: number;} = {}
@@ -33,6 +57,11 @@ export class Sections {
         yield* this.api.paginate<Person>(`/sections/${section_id}/teachers`, options);
     }
 
+    /**
+     * Paginates through all students in a section.
+     * @param section_id The UUID of the section
+     * @param options Provide a `limit` for the max number of results
+     */
     async *listStudents(
         section_id: string,
         options: { limit?: number;} = {}

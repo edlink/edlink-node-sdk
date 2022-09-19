@@ -55,10 +55,20 @@ export class Edlink {
         this.auth = new Auth(this);
     }
 
+    /**
+     * Initialize an instance of the Edlink Graph API with a token set.
+     * @param token_set The TokenSet used to authenticate the request
+     * @returns {Graph} An instance of the Edlink Graph API interface using the provided TokenSet
+     */
     public use(token_set: IntegrationTokenSet): Graph;
+    /**
+     * Initialize an instance of the Edlink User API with a token set.
+     * @param token_set The TokenSet used to authenticate the request
+     * @returns {User} An instance of the Edlink User API interface using the provided TokenSet
+     */
     public use(token_set: PersonTokenSet): User;
 
-    public use(token_set: any): any {
+    public use(token_set: PersonTokenSet | IntegrationTokenSet): User | Graph {
         if (token_set.type === TokenSetType.Person) {
             return new User(this, token_set);
         } else {
@@ -75,11 +85,19 @@ export class Edlink {
         }
     }
 
+    /**
+     * Check the status of the Edlink API
+     */
     static async up() {
         const response = await axios.get('https://ed.link/api/up');
         return response.data;
     }
 
+    /**
+     * Generate a login URL for a user to authenticate with via Edlink.
+     * @param config A config object containing the `redirect_uri` and `state` parameters
+     * @returns The URL to redirect the user to in order to authenticate
+     */
     loginUrl({ redirect_uri, state }: { redirect_uri?: string; state?: string } = {}) {
         const params = {
             client_id: this.client_id,
