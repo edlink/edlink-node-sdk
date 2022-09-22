@@ -1,5 +1,7 @@
 # Edlink Node SDK [![CI](https://github.com/edlink/edlink-node-sdk/actions/workflows/analyze.yml/badge.svg)](https://github.com/edlink/edlink-node-sdk/actions/workflows/analyze.yml)
 
+> You can find more thorough documentation on the [Edlink SDK Docs](https://ed.link/docs/api/v2.0/sdk/typescript/get-started).
+
 This Edlink JavaScript & TypeScript SDK is a NodeJS wrapper for the Edlink API.
 
 # Get Started
@@ -97,21 +99,4 @@ const person_token_set = await edlink.auth.grant({
 
 // You can now make requests on behalf of this user
 const profile = await edlink.use(person_token_set).my.profile();
-```
-
-## Notes
-
-```typescript
-// DEPENDENCY ORDER
-const ENTITIES = [
-    'districts',
-    'schools',
-    'sessions',
-    'courses',
-    'classes',
-    'sections',
-    'people',
-    'enrollments',
-    'agents'
-];
 ```
