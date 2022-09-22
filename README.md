@@ -15,7 +15,7 @@ yarn add edlink
 ```typescript
 // Initialize with your Edlink application
 // Your credentials can be found on the Edlink Dashboard
-import { Edlink } from 'edlink';
+import { Edlink } from '@edlink/typescript';
 
 const edlink = new Edlink({
     version: 2,

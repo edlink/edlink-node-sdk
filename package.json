@@ -29,7 +29,7 @@
     "trailingComma": "none",
     "printWidth": 120
   },
-  "name": "edlink",
+  "name": "@edlink/typescript",
   "author": "Jaron",
   "module": "dist/edlink.esm.js",
   "devDependencies": {
