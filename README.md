@@ -8,10 +8,10 @@ This Edlink JavaScript & TypeScript SDK is a NodeJS wrapper for the Edlink API.
 
 ## Install
 
-Install the `edlink` package using `npm` or `yarn`.
+Install the `@edlink/typescript` package using `npm` or `yarn`.
 
 ```
-yarn add edlink
+yarn add @edlink/typescript
 ```
 
 ```typescript
