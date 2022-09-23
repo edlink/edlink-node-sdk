@@ -1,7 +1,19 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { Edlink, Class, Section, Enrollment, Session, Course, Person, TokenSetType, IntegrationTokenSet, Agent } from '../src';
+import {
+    Edlink,
+    Class,
+    Section,
+    Enrollment,
+    Session,
+    Course,
+    Person,
+    TokenSetType,
+    IntegrationTokenSet,
+    Agent,
+    PersonTokenSet
+} from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;
 
@@ -34,10 +46,14 @@ describe('User', () => {
             // List assignments for that class (fetching 1)
             for await (const assignment of edlink.use(refresh).assignments.list(_class.id, { limit: 1 })) {
                 // List submissions for that assignment (fetching 1)
-                for await (const submission of edlink.use(refresh).submissions.list(_class.id, assignment.id, { limit: 1 })) {
+                for await (const submission of edlink
+                    .use(refresh)
+                    .submissions.list(_class.id, assignment.id, { limit: 1 })) {
                     // Generate a new grade for that submission and attempt to update it
                     const new_grade = Math.floor(Math.random() * 100);
-                    const new_submissions = await edlink.use(refresh).submissions.update(_class.id, assignment.id, submission.id, {grade_points: new_grade} );
+                    const new_submissions = await edlink
+                        .use(refresh)
+                        .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
                     expect(new_submissions.grade_points).toBe(new_grade);
                 }
             }
@@ -47,6 +63,45 @@ describe('User', () => {
         const integration = await edlink.use(refresh).my.integration();
         expect(profile).toBeDefined();
         expect(integration).toBeDefined();
+    });
+});
+
+describe.skip('Error Handling', () => {
+    it('should throw an error when the token is invalid', async () => {
+        const invalid_token_set: PersonTokenSet = {
+            access_token: 'invalid',
+            refresh_token: 'invalid',
+            type: TokenSetType.Person
+        };
+        await expect(edlink.use(invalid_token_set).my.profile()).rejects.toThrow(
+            `A valid v4 UUID is expected for parameter 'class_id'.`
+        );
+    });
+
+    it('should throw error with an invalid id', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        await expect(edlink.use(refresh).classes.fetch('invalid')).rejects.toThrow(
+            `A valid v4 UUID is expected for parameter 'class_id'.`
+        );
+    });
+
+    it('[User] should throw error with a not found id', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        await expect(edlink.use(refresh).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
+            'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this person.'
+        );
+    });
+
+    it('[Graph] should throw error with a not found id', async () => {
+        await expect(edlink.use(token_set).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
+            'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.'
+        );
+
+        edlink.use(token_set).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe').catch((error) => {
+            console.log(error.message); // School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.
+            console.log(error.code); // NOT_FOUND
+            console.log(error.status); // 400
+        });
     });
 });
 
@@ -201,17 +256,26 @@ describe('Graph', () => {
 
     it('/api/v2/graph/people', async () => {
         const data: Map<string, Person> = new Map();
-        for await (const person of edlink.use(token_set).people.list()) {
-            data.set(person.id, person);
+        try {
+            for await (const person of edlink.use(token_set).people.list({
+                filter: {
+                    first_name: [
+                        { operator: 'starts with', value: 'Lil' }
+                    ]
+                }
+            })) {
+                data.set(person.id, person);
+            }
+            console.log('person', Array.from(data.entries()));
+        } catch(error) {
+            console.log('ERROR', error);
         }
-        console.log('person', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/people/:person_id', async () => {
         for await (const _person of edlink.use(token_set).people.list({ limit: 1 })) {
             const person = await edlink.use(token_set).people.fetch(_person.id);
             expect(person).toBeDefined();
-            expect(person).toStrictEqual(_person);
         }
     });
 
@@ -311,5 +375,4 @@ describe('Graph', () => {
     //         expect(agent).toStrictEqual(agent2);
     //     }
     // });
-    
 });

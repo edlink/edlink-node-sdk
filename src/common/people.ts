@@ -1,5 +1,5 @@
 import { Person } from '..';
-import { Agent, BearerTokenAPI, Class, District, Enrollment, School, Section } from '../types';
+import { Agent, BearerTokenAPI, Class, District, Enrollment, RequestOptions, School, Section } from '../types';
 
 export class People {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class People {
      * Paginates through all people.
      * @param options Provide a `limit` for the max number of results
      */
-    async *list(options: { limit?: number; } = {}): AsyncGenerator<Person> {
+    async *list(options: RequestOptions = {}): AsyncGenerator<Person> {
         yield* this.api.paginate<Person>('/people', options);
     }
 
@@ -18,22 +18,19 @@ export class People {
      * @returns The requested person
      * @throws `404` If the person does not exist
      */
-    fetch(person_id: string): Promise<Person> {
-        return this.api.request(`/people/${person_id}`);
+    fetch(person_id: string, options: RequestOptions = {}): Promise<Person> {
+        return this.api.request(`/people/${person_id}`, {}, options);
     }
 
     /**
      * Paginates through all enrollments for a person.
-     * 
+     *
      * This is mostly useful for teachers when used via the User API
      * as the teacher can see all the student's enrollments.
      * @param person_id The UUID of the person
      * @param options Provide a `limit` for the max number of results
      */
-    async *listEnrollments(
-        person_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<Enrollment> {
+    async *listEnrollments(person_id: string, options: RequestOptions = {}): AsyncGenerator<Enrollment> {
         yield* this.api.paginate<Enrollment>(`/people/${person_id}/enrollments`, options);
     }
 
@@ -42,10 +39,7 @@ export class People {
      * @param person_id The UUID of the person
      * @param options Provide a `limit` for the max number of results
      */
-    async *listDistricts(
-        person_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<District> {
+    async *listDistricts(person_id: string, options: RequestOptions = {}): AsyncGenerator<District> {
         yield* this.api.paginate<District>(`/people/${person_id}/districts`, options);
     }
 
@@ -54,10 +48,7 @@ export class People {
      * @param person_id The UUID of the person
      * @param options Provide a `limit` for the max number of results
      */
-    async *listSchools(
-        person_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<School> {
+    async *listSchools(person_id: string, options: RequestOptions = {}): AsyncGenerator<School> {
         yield* this.api.paginate<School>(`/people/${person_id}/schools`, options);
     }
 
@@ -66,10 +57,7 @@ export class People {
      * @param person_id The UUID of the person
      * @param options Provide a `limit` for the max number of results
      */
-    async *listClasses(
-        person_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<Class> {
+    async *listClasses(person_id: string, options: RequestOptions = {}): AsyncGenerator<Class> {
         yield* this.api.paginate<Class>(`/people/${person_id}/classes`, options);
     }
 
@@ -78,10 +66,7 @@ export class People {
      * @param person_id The UUID of the person
      * @param options Provide a `limit` for the max number of results
      */
-    async *listSections(
-        person_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<Section> {
+    async *listSections(person_id: string, options: RequestOptions = {}): AsyncGenerator<Section> {
         yield* this.api.paginate<Section>(`/people/${person_id}/sections`, options);
     }
 
@@ -90,10 +75,7 @@ export class People {
      * @param person_id The UUID of the person
      * @param options Provide a `limit` for the max number of results
      */
-    async *listAgents(
-        person_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<Agent> {
+    async *listAgents(person_id: string, options: RequestOptions = {}): AsyncGenerator<Agent> {
         yield* this.api.paginate<Agent>(`/people/${person_id}/agents`, options);
     }
 }

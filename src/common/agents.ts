@@ -1,4 +1,4 @@
-import { Agent, BearerTokenAPI } from '../types';
+import { Agent, BearerTokenAPI, RequestOptions } from '../types';
 
 export class Agents {
     constructor(private api: BearerTokenAPI) {}
@@ -7,7 +7,7 @@ export class Agents {
      * Lists all agents.
      * @param options provide a `limit` for the max number of results
      */
-    async *list(options: { limit?: number; } = {}): AsyncGenerator<Agent> {
+    async *list(options: RequestOptions = {}): AsyncGenerator<Agent> {
         yield* this.api.paginate<Agent>('/agents', options);
     }
 
@@ -17,7 +17,7 @@ export class Agents {
      * @returns the agent
      * @throws `404` if the agent does not exist
      */
-    fetch(agent_id: string): Promise<Agent> {
-        return this.api.request(`/agents/${agent_id}`);
+    fetch(agent_id: string, options: RequestOptions = {}): Promise<Agent> {
+        return this.api.request(`/agents/${agent_id}`, {}, options);
     }
 }

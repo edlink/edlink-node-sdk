@@ -1,5 +1,5 @@
 import { Section } from '..';
-import { BearerTokenAPI, Enrollment, Person } from '../types';
+import { BearerTokenAPI, Enrollment, Person, RequestOptions } from '../types';
 
 export class Sections {
     constructor(private api: BearerTokenAPI) {}
@@ -8,17 +8,17 @@ export class Sections {
      * Paginates through all sections.
      * @param options Provide a `limit` for the max number of results
      */
-    async *list(options: { limit?: number;} = {}): AsyncGenerator<Section> {
+    async *list(options: RequestOptions = {}): AsyncGenerator<Section> {
         yield* this.api.paginate<Section>('/sections', options);
     }
 
     /**
      * Fetch a single section by ID.
      * @param section_id The UUID of the section
-     * @returns 
+     * @returns
      */
-    fetch(section_id: string): Promise<Section> {
-        return this.api.request(`/sections/${section_id}`);
+    fetch(section_id: string, options: RequestOptions = {}): Promise<Section> {
+        return this.api.request(`/sections/${section_id}`, {}, options);
     }
 
     /**
@@ -26,10 +26,7 @@ export class Sections {
      * @param section_id The UUID of the section
      * @param options Provide a `limit` for the max number of results
      */
-    async *listEnrollments(
-        section_id: string,
-        options: { limit?: number;} = {}
-    ): AsyncGenerator<Enrollment> {
+    async *listEnrollments(section_id: string, options: RequestOptions = {}): AsyncGenerator<Enrollment> {
         yield* this.api.paginate<Enrollment>(`/sections/${section_id}/enrollments`, options);
     }
 
@@ -38,10 +35,7 @@ export class Sections {
      * @param section_id The UUID of the section
      * @param options Provide a `limit` for the max number of results
      */
-    async *listPeople(
-        section_id: string,
-        options: { limit?: number;} = {}
-    ): AsyncGenerator<Person> {
+    async *listPeople(section_id: string, options: RequestOptions = {}): AsyncGenerator<Person> {
         yield* this.api.paginate<Person>(`/sections/${section_id}/people`, options);
     }
 
@@ -50,10 +44,7 @@ export class Sections {
      * @param section_id The UUID of the section
      * @param options Provide a `limit` for the max number of results
      */
-    async *listTeachers(
-        section_id: string,
-        options: { limit?: number;} = {}
-    ): AsyncGenerator<Person> {
+    async *listTeachers(section_id: string, options: RequestOptions = {}): AsyncGenerator<Person> {
         yield* this.api.paginate<Person>(`/sections/${section_id}/teachers`, options);
     }
 
@@ -62,10 +53,7 @@ export class Sections {
      * @param section_id The UUID of the section
      * @param options Provide a `limit` for the max number of results
      */
-    async *listStudents(
-        section_id: string,
-        options: { limit?: number;} = {}
-    ): AsyncGenerator<Person> {
+    async *listStudents(section_id: string, options: RequestOptions = {}): AsyncGenerator<Person> {
         yield* this.api.paginate<Person>(`/sections/${section_id}/students`, options);
     }
 }

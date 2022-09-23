@@ -1,4 +1,4 @@
-import { BearerTokenAPI, Assignment } from "../types";
+import { BearerTokenAPI, Assignment, RequestOptions } from '../types';
 
 export class Assignments {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class Assignments {
      * @param class_id The UUID of the class
      * @param options provide a `limit` for the max number of results
      */
-    public async *list(class_id: string, options: { limit?: number } = {}): AsyncGenerator<Assignment> {
+    public async *list(class_id: string, options: RequestOptions = {}): AsyncGenerator<Assignment> {
         yield* this.api.paginate<Assignment>(`/classes/${class_id}/assignments`, options);
     }
 
@@ -19,8 +19,8 @@ export class Assignments {
      * @returns The requested assignment
      * @throws `404` if the assignment does not exist
      */
-    public async fetch(class_id: string, assignment_id: string): Promise<Assignment> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`);
+    public async fetch(class_id: string, assignment_id: string, options: RequestOptions): Promise<Assignment> {
+        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {}, options);
     }
 
     /**
@@ -33,7 +33,7 @@ export class Assignments {
     public async create(class_id: string, assignment: Assignment): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments`, {
             method: 'POST',
-            data: assignment,
+            data: assignment
         });
     }
 
@@ -48,12 +48,12 @@ export class Assignments {
     public async update(class_id: string, assignment_id: string, assignment: Partial<Assignment>): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {
             method: 'PATCH',
-            data: assignment,
+            data: assignment
         });
     }
 
     /**
-     * 
+     *
      * @param class_id The UUID of the class
      * @param assignment_id The UUID of the assignment
      * @returns `200` if the assignment was deleted
@@ -61,7 +61,7 @@ export class Assignments {
      */
     public async delete(class_id: string, assignment_id: string): Promise<void> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {
-            method: 'DELETE',
+            method: 'DELETE'
         });
     }
 }

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { serialize } from './common';
 import { Graph } from './graph';
 import { IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
 import { User } from './user';
@@ -20,17 +21,6 @@ export {
     TokenSetType
 } from './types';
 
-function serialize(object: Record<string, string | undefined | null>) {
-    const str = [];
-
-    for (const [key, value] of Object.entries(object)) {
-        if (value) {
-            str.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
-        }
-    }
-
-    return str.join('&');
-}
 
 export type EdlinkConfig = {
     version?: number;

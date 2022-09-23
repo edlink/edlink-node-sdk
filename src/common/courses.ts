@@ -1,5 +1,5 @@
 import { Course } from '..';
-import { BearerTokenAPI, Class } from '../types';
+import { BearerTokenAPI, Class, RequestOptions } from '../types';
 
 export class Courses {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class Courses {
      * Paginates through all enrollments in a course.
      * @param options Provide a `limit` for the max number of results
      */
-    async *list(options: { limit?: number; } = {}): AsyncGenerator<Course> {
+    async *list(options: RequestOptions = {}): AsyncGenerator<Course> {
         yield* this.api.paginate<Course>('/courses', options);
     }
 
@@ -17,8 +17,8 @@ export class Courses {
      * @param course_id The UUID of the course
      * @returns The requested course
      */
-    fetch(course_id: string): Promise<Course> {
-        return this.api.request(`/courses/${course_id}`);
+    fetch(course_id: string, options: RequestOptions = {}): Promise<Course> {
+        return this.api.request(`/courses/${course_id}`, {}, options);
     }
 
     /**
@@ -26,10 +26,7 @@ export class Courses {
      * @param course_id The UUID of the course
      * @param options Provide a `limit` for the max number of results
      */
-    async *listClasses(
-        course_id: string,
-        options: { limit?: number; } = {}
-    ): AsyncGenerator<Class> {
+    async *listClasses(course_id: string, options: RequestOptions = {}): AsyncGenerator<Class> {
         yield* this.api.paginate<Class>(`/courses/${course_id}/classes`, options);
     }
 }

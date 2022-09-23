@@ -10,3 +10,15 @@ export { Sessions } from './sessions';
 export { Categories } from './categories';
 export { Assignments } from './assignments';
 export { Submissions } from './submissions';
+
+export function serialize(object: Record<string, any>) {
+    const str = [];
+
+    for (const [key, value] of Object.entries(object)) {
+        if (value) {
+            str.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+        }
+    }
+
+    return str.join('&');
+}

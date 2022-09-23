@@ -180,3 +180,9 @@ export type IntegrationTokenSet = TokenSet & {
     type: TokenSetType.Integration;
     access_token: string;
 };
+
+export type RequestOptions = {
+    limit?: number;
+    filter?: Record<string, any>;
+    expand?: string[];
+}

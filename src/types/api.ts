@@ -1,13 +1,27 @@
 import axios, { AxiosRequestConfig, AxiosStatic } from 'axios';
 import { Edlink } from '..';
-import { TokenSet, TokenSetType } from './common';
+import { serialize } from '../common';
+import { RequestOptions, TokenSet, TokenSetType } from './common';
+
+class EdlinkError extends Error {
+    status?: number;
+    code?: string;
+    errors: any[];
+
+    constructor({ message, status, code, errors }: { message: string; status: number; code?: string; errors: any[] }) {
+        super(message);
+        this.status = status;
+        this.code = code;
+        this.errors = errors;
+    }
+}
 
 export class BearerTokenAPI {
     private token_set: TokenSet;
     private version: number;
     private api: 'graph' | 'my';
     public axios: AxiosStatic;
-    public edlink: Edlink
+    public edlink: Edlink;
 
     constructor(edlink: Edlink, token_set: TokenSet) {
         // Assign config
@@ -18,7 +32,12 @@ export class BearerTokenAPI {
         this.edlink = edlink;
     }
 
-    async request<T>(endpoint: string, config: AxiosRequestConfig = {}, raw = false): Promise<T> {
+    async request<T>(
+        endpoint: string,
+        config: AxiosRequestConfig = {},
+        options: RequestOptions = {},
+        raw = false
+    ): Promise<T> {
         // Check if the token needs to be refreshed if this is a person token set.
         if (this.token_set.type === TokenSetType.Person && this.requiresTokenRefresh()) {
             // do the token refresh
@@ -29,10 +48,17 @@ export class BearerTokenAPI {
             this.token_set.refresh_token = refresh_token;
             this.token_set.expiration_date = new Date(Date.now() + 3600 * 1000);
         }
+        const formatted_options: { $filter?: string; $expand?: string[] } = {};
+        if (options.filter) {
+            formatted_options['$filter'] = JSON.stringify(options.filter);
+        }
+        if (options.expand) {
+            formatted_options['$expand'] = options.expand;
+        }
         // Set url
         config.url = endpoint.startsWith('http')
             ? endpoint
-            : `https://ed.link/api/v${this.version}/${this.api}${endpoint}`;
+            : `https://ed.link/api/v${this.version}/${this.api}${endpoint}?${serialize(formatted_options)}`;
         // Initialize headers
         if (!config.headers) {
             config.headers = {};
@@ -44,9 +70,20 @@ export class BearerTokenAPI {
         // Make request
         const response = await this.axios.request(config).catch(error => {
             // TODO: Some custom error handling?
-            console.log(error.response.data);
+            if (error.response.data && error.response.data.$errors && error.response.data.$errors.length > 0) {
+                throw new EdlinkError({
+                    ...error.response.data.$errors[0],
+                    status: error.response.status,
+                    errors: error.response.data.$errors.slice(1)
+                });
+            }
             throw error;
         });
+        if (response.data.$warnings) {
+            for (const warning of response.data.$warnings) {
+                console.warn(`Edlink API Warning: ${warning.code} ${warning.message}`);
+            }
+        }
         return raw ? response.data : response.data.$data;
     }
 
@@ -62,7 +99,12 @@ export class BearerTokenAPI {
         let remaining = options.limit;
 
         do {
-            const response: { $data: T[]; $next?: string } = await this.request(next ?? endpoint, config, true);
+            const response: { $data: T[]; $next?: string } = await this.request(
+                next ?? endpoint,
+                config,
+                options,
+                true
+            );
             next = response.$next;
             data = response.$data;
             for (const item of data) {

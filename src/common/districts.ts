@@ -1,4 +1,4 @@
-import { BearerTokenAPI, District, Person } from '../types';
+import { BearerTokenAPI, District, Person, RequestOptions } from '../types';
 
 export class Districts {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class Districts {
      * All Edlink sources contain a single district.
      * @param options Provide a `limit` for the max number of results
      */
-    async *list(options: { limit?: number; } = {}): AsyncGenerator<District> {
+    async *list(options: RequestOptions = {}): AsyncGenerator<District> {
         yield* this.api.paginate<District>('/districts', options);
     }
 
@@ -17,8 +17,8 @@ export class Districts {
      * @param district_id The UUID of the district
      * @returns The requested district
      */
-    fetch(district_id: string): Promise<District> {
-        return this.api.request(`/districts/${district_id}`);
+    fetch(district_id: string, options: RequestOptions = {}): Promise<District> {
+        return this.api.request(`/districts/${district_id}`, {}, options);
     }
 
     /**
@@ -27,7 +27,7 @@ export class Districts {
      * @param district_id The UUID of the district to list admins for
      * @param options Provide a `limit` for the max number of results
      */
-    async *listAdministrators(district_id: string, options: { limit?: number; } = {}): AsyncGenerator<Person> {
+    async *listAdministrators(district_id: string, options: RequestOptions = {}): AsyncGenerator<Person> {
         yield* this.api.paginate<Person>(`/districts/${district_id}/administrators`, options);
     }
 }
