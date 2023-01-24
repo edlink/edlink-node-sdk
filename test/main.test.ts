@@ -46,16 +46,17 @@ describe('User', () => {
             // List assignments for that class (fetching 1)
             for await (const assignment of edlink.use(refresh).assignments.list(_class.id, { limit: 1 })) {
                 // List submissions for that assignment (fetching 1)
-                // for await (const submission of edlink
-                //     .use(refresh)
-                //     .submissions.list(_class.id, assignment.id, { limit: 1 })) {
-                //         // Generate a new grade for that submission and attempt to update it
-                //         const new_grade = Math.floor(Math.random() * 100);
-                //         const new_submissions = await edlink
-                //             .use(refresh)
-                //             .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
-                //         expect(new_submissions.grade_points).toBe(new_grade);
-                // }
+                for await (const submission of edlink
+                    .use(refresh)
+                    .submissions.list(_class.id, assignment.id, { limit: 1 })) {
+                        console.log(submission)
+                        // Generate a new grade for that submission and attempt to update it
+                        // const new_grade = Math.floor(Math.random() * 100);
+                        // const new_submissions = await edlink
+                        //     .use(refresh)
+                        //     .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
+                        // expect(new_submissions.grade_points).toBe(new_grade);
+                }
             }
         }
 
