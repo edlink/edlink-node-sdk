@@ -36,6 +36,12 @@ import { Attachment } from ".";
     /**
      * @type {string}
      * @memberof Assignment
+     * @description The title of the assignment.
+     */
+    title: string;
+    /**
+     * @type {string}
+     * @memberof Assignment
      * @description The description of the assignment.
      */
     description: string;
