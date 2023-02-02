@@ -169,10 +169,13 @@ export type TokenSet = {
     expiration_date?: Date;
 };
 
+/**
+ * Important note: If you do not provide a refresh token the SDK will not be able to refresh the token for you and requests made an hour after the initial token exchange will fail
+ */
 export type PersonTokenSet = TokenSet & {
     type: TokenSetType.Person;
     access_token?: string;
-    refresh_token: string;
+    refresh_token?: string;
     expiration_date?: Date;
 };
 
@@ -185,4 +188,4 @@ export type RequestOptions = {
     limit?: number;
     filter?: Record<string, any>;
     expand?: string[];
-}
+};

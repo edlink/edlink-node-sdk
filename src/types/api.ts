@@ -8,7 +8,7 @@ class EdlinkError extends Error {
     code?: string;
     errors: any[];
 
-    constructor({ message, status, code, errors }: { message: string; status: number; code?: string; errors: any[] }) {
+    constructor({ message, status, code, errors = [] }: { message: string; status: number; code?: string; errors?: any[] }) {
         super(message);
         this.status = status;
         this.code = code;
@@ -39,9 +39,16 @@ export class BearerTokenAPI {
         raw = false
     ): Promise<T> {
         // Check if the token needs to be refreshed if this is a person token set.
-        if (this.token_set.type === TokenSetType.Person && this.requiresTokenRefresh()) {
+        if (this.token_set.type === TokenSetType.Person && this.token_set.refresh_token && this.requiresTokenRefresh()) {
             // do the token refresh
-            const { access_token, refresh_token } = await this.edlink.auth.refresh(this.token_set.refresh_token!);
+            const { access_token, refresh_token } = await this.edlink.auth.refresh(this.token_set.refresh_token!)
+                .catch((error) => {
+                    throw new EdlinkError({
+                        message: 'Failed to refresh token.',
+                        status: error.response.status,
+                        code: 'BAD_REQUEST'
+                    });
+                });
 
             // update the tokenset
             this.token_set.access_token = access_token;
@@ -70,11 +77,20 @@ export class BearerTokenAPI {
         // Make request
         const response = await this.axios.request(config).catch(error => {
             // TODO: Some custom error handling?
+                console.log(error.response.data)
             if (error.response.data && error.response.data.$errors && error.response.data.$errors.length > 0) {
+                const $errors = error.response.data.$errors;
+                for (const _error of $errors) {
+                    console.warn(`Edlink API Error: ${_error.code} ${_error.message}`);
+                }
+                if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
+                    console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
+                }
+                console.log($errors[0])
                 throw new EdlinkError({
-                    ...error.response.data.$errors[0],
+                    ...$errors[0],
                     status: error.response.status,
-                    errors: error.response.data.$errors.slice(1)
+                    errors: $errors.slice(1)
                 });
             }
             throw error;

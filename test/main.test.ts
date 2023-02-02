@@ -31,7 +31,7 @@ const edlink = new Edlink({
 // jest.setTimeout(10000);
 
 describe('User', () => {
-    it.only('auth', async () => {
+    it('auth', async () => {
         // const grant = await edlink.auth.grant({
         //     code: process.env.CODE!,
         //     redirect_uri: 'https://oauthdebugger.com/debug'
@@ -67,15 +67,25 @@ describe('User', () => {
     });
 });
 
-describe.skip('Error Handling', () => {
-    it('should throw an error when the token is invalid', async () => {
+describe('Error Handling', () => {
+    it('should throw an error when the access token is invalid', async () => {
+        const invalid_token_set: PersonTokenSet = {
+            access_token: 'invalid',
+            type: TokenSetType.Person
+        };
+        await expect(edlink.use(invalid_token_set).my.profile()).rejects.toThrow(
+            `You must supply a valid access token to access this endpoint.`
+        );
+    });
+
+    it('should throw an error when the refresh token is invalid', async () => {
         const invalid_token_set: PersonTokenSet = {
             access_token: 'invalid',
             refresh_token: 'invalid',
             type: TokenSetType.Person
         };
         await expect(edlink.use(invalid_token_set).my.profile()).rejects.toThrow(
-            `A valid v4 UUID is expected for parameter 'class_id'.`
+            `Failed to refresh token.`
         );
     });
 
