@@ -92,7 +92,7 @@ describe('Error Handling', () => {
     it('should throw error with an invalid id', async () => {
         const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
         await expect(edlink.use(refresh).classes.fetch('invalid')).rejects.toThrow(
-            `A valid v4 UUID is expected for parameter 'class_id'.`
+            `A valid v4 UUID or Alias is expected for parameter 'class_id'.`
         );
     });
 
