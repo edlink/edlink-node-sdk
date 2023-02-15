@@ -30,7 +30,7 @@ export class Assignments {
      * @returns The created assignment
      * @throws `400` if the assignment is invalid
      */
-    public async create(class_id: string, assignment: Assignment): Promise<Assignment> {
+    public async create(class_id: string, assignment: Partial<Assignment>): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments`, {
             method: 'POST',
             data: assignment
