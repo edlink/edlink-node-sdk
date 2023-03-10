@@ -16,3 +16,4 @@ export * from './assignment';
 export * from './category';
 export * from './submission';
 export * from './attachment';
+export * from './license';
