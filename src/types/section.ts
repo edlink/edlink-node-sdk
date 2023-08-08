@@ -1,3 +1,5 @@
+import { Identifier } from ".";
+
 /**
  * 
  * @export
@@ -28,6 +30,12 @@ export interface Section {
      * @memberof Section
      */
     properties: any;
+    /**
+     * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
+     * @type {Identifier}
+     * @memberof Section
+     */
+    identifiers: Identifier[];
     /**
      * 
      * @type {string}

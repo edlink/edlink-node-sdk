@@ -10,6 +10,7 @@ export { Sessions } from './sessions';
 export { Categories } from './categories';
 export { Assignments } from './assignments';
 export { Submissions } from './submissions';
+export { Licenses } from './licenses';
 
 export function serialize(object: Record<string, any>) {
     const str = [];

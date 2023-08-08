@@ -122,9 +122,15 @@ describe('Graph', () => {
         console.log(edlink.loginUrl({ redirect_uri: 'https://oauthdebugger.com/debug' }));
     });
 
+    it('/api/v2/graph/licenses', async () => {
+        for await (const license of edlink.use(token_set).licenses.list({ limit: 1 })) {
+            console.log(license);
+        }
+    });
+
     it('/api/v2/graph/classes', async () => {
-        for await (const school of edlink.use(token_set).classes.list({ limit: 1 })) {
-            console.log(school);
+        for await (const _class of edlink.use(token_set).classes.list({ limit: 1 })) {
+            console.log(_class);
         }
     });
 

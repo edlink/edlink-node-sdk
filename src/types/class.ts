@@ -35,7 +35,7 @@ export interface Class {
      * @type {Identifier}
      * @memberof Class
      */
-    identifiers: Identifier;
+    identifiers: Identifier[];
     /**
      * 
      * @type {string}

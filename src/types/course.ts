@@ -1,4 +1,4 @@
-import { GradeLevel, Subject } from ".";
+import { GradeLevel, Identifier, Subject } from ".";
 
 /**
  * 
@@ -30,6 +30,12 @@ export interface Course {
      * @memberof Course
      */
     properties: any;
+    /**
+     * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
+     * @type {Identifier}
+     * @memberof Course
+     */
+    identifiers: Identifier[];
     /**
      * 
      * @type {string}

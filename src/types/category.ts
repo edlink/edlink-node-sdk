@@ -1,3 +1,5 @@
+import { Identifier } from ".";
+
 /**
  * [Category Model](https://ed.link/docs/api/v2.0/models/external/category)
  * @export
@@ -30,6 +32,12 @@
      * @memberof Category
      */
     properties: any;
+    /**
+     * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
+     * @type {Identifier}
+     * @memberof Category
+     */
+    identifiers: Identifier[];
     /**
      * 
      * The title of the category.
