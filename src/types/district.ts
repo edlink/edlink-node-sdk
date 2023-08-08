@@ -1,4 +1,4 @@
-import { Address } from ".";
+import { Address, Identifier } from ".";
 
 /**
  * 
@@ -30,6 +30,12 @@ export interface District {
      * @memberof District
      */
     properties: any;
+    /**
+     * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
+     * @type {Identifier}
+     * @memberof District
+     */
+    identifiers: Identifier[];
     /**
      * 
      * @type {string}

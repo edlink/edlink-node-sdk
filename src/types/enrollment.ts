@@ -1,4 +1,4 @@
-import { Role } from ".";
+import { Identifier, Role } from ".";
 
 /**
  * 
@@ -30,6 +30,12 @@ export interface Enrollment {
      * @memberof Enrollment
      */
     properties: any;
+    /**
+     * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
+     * @type {Identifier}
+     * @memberof Enrollment
+     */
+    identifiers: Identifier[];
     /**
      * 
      * @type {string}

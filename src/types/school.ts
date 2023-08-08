@@ -1,4 +1,4 @@
-import { GradeLevel } from './common';
+import { GradeLevel, Identifier } from './common';
 import { Address } from './address';
 /**
  * 
@@ -30,6 +30,12 @@ export interface School {
      * @memberof School
      */
     properties: any;
+    /**
+     * [Identifier Type](https://ed.link/docs/api/v2.0/models/external/enums/identifier-type)
+     * @type {Identifier}
+     * @memberof School
+     */
+    identifiers: Identifier[];
     /**
      * 
      * @type {string}
