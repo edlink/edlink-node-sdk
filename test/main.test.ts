@@ -49,13 +49,13 @@ describe('User', () => {
                 for await (const submission of edlink
                     .use(refresh)
                     .submissions.list(_class.id, assignment.id, { limit: 1 })) {
-                        console.log(submission)
-                        // Generate a new grade for that submission and attempt to update it
-                        // const new_grade = Math.floor(Math.random() * 100);
-                        // const new_submissions = await edlink
-                        //     .use(refresh)
-                        //     .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
-                        // expect(new_submissions.grade_points).toBe(new_grade);
+                    console.log(submission);
+                    // Generate a new grade for that submission and attempt to update it
+                    // const new_grade = Math.floor(Math.random() * 100);
+                    // const new_submissions = await edlink
+                    //     .use(refresh)
+                    //     .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
+                    // expect(new_submissions.grade_points).toBe(new_grade);
                 }
             }
         }
@@ -84,15 +84,13 @@ describe('Error Handling', () => {
             refresh_token: 'invalid',
             type: TokenSetType.Person
         };
-        await expect(edlink.use(invalid_token_set).my.profile()).rejects.toThrow(
-            `Failed to refresh token.`
-        );
+        await expect(edlink.use(invalid_token_set).my.profile()).rejects.toThrow(`Failed to refresh token.`);
     });
 
     it('should throw error with an invalid id', async () => {
         const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
         await expect(edlink.use(refresh).classes.fetch('invalid')).rejects.toThrow(
-            `A valid v4 UUID or Alias is expected for parameter 'class_id'.`
+            `A valid v4 or v5 UUID or Alias is expected for parameter 'class_id'.`
         );
     });
 
@@ -108,11 +106,14 @@ describe('Error Handling', () => {
             'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.'
         );
 
-        edlink.use(token_set).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe').catch((error) => {
-            console.log(error.message); // School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.
-            console.log(error.code); // NOT_FOUND
-            console.log(error.status); // 400
-        });
+        edlink
+            .use(token_set)
+            .schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')
+            .catch(error => {
+                console.log(error.message); // School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.
+                console.log(error.code); // NOT_FOUND
+                console.log(error.status); // 400
+            });
     });
 });
 
