@@ -5,21 +5,7 @@ import { IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
 import { User } from './user';
 import { Auth } from './user/auth';
 
-export {
-    District,
-    School,
-    Session,
-    Course,
-    Class,
-    Section,
-    Person,
-    Enrollment,
-    Agent,
-    TokenSet,
-    PersonTokenSet,
-    IntegrationTokenSet,
-    TokenSetType
-} from './types';
+export * from './types';
 
 
 export type EdlinkConfig = {
