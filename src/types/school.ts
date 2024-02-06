@@ -23,7 +23,7 @@ export interface School {
      * @type {Date}
      * @memberof School
      */
-    updated_Date: Date;
+    updated_date: Date;
     /**
      * 
      * @type {any}
