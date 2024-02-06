@@ -1,5 +1,6 @@
 import { GradeLevel, Identifier, Role } from './common';
 import { Demographics } from './demographics';
+import { Product } from './product';
 /**
  * 
  * @export
@@ -126,4 +127,17 @@ export interface Person {
      * @memberof Person
      */
     school_ids: Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Person
+     */
+    product_ids: Array<string>;
+    /**
+     * 
+     * @type {Array<Product>}
+     * @memberof Person
+     */
+    products?: Array<Product>;
+
 }

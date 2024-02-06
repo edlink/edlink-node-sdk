@@ -1,5 +1,6 @@
 import { GradeLevel, Identifier } from './common';
 import { Address } from './address';
+import { Product } from './product';
 /**
  * 
  * @export
@@ -84,4 +85,16 @@ export interface School {
      * @memberof School
      */
     district_id: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof School
+     */
+    product_ids: Array<string>;
+    /**
+     * 
+     * @type {Array<Product>}
+     * @memberof School
+     */
+    products?: Array<Product>;
 }
