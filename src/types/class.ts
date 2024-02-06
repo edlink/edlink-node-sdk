@@ -1,4 +1,5 @@
 import { GradeLevel, Identifier, Subject } from ".";
+import { Product } from "./product";
 
 /**
  * 
@@ -108,6 +109,18 @@ export interface Class {
      * @memberof Class
      */
     school_id: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof Class
+     */
+    product_ids: Array<string>;
+    /**
+     * 
+     * @type {Array<Product>}
+     * @memberof Class
+     */
+    products?: Array<Product>;
 }
 
 /**

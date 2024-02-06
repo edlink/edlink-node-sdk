@@ -24,7 +24,8 @@ const token_set: IntegrationTokenSet = {
 
 const edlink = new Edlink({
     version: 2,
-    client_id: 'e6504765-238a-418f-871a-2e789c1f26f5',
+    // client_id: 'e6504765-238a-418f-871a-2e789c1f26f5',
+    client_id: '36ad8864-d789-45b6-9df8-334c2f32445b',
     client_secret: process.env.CLIENT_SECRET!
 });
 
@@ -393,4 +394,27 @@ describe('Graph', () => {
     //         expect(agent).toStrictEqual(agent2);
     //     }
     // });
+
+    // Expansions
+
+    // it.only('/api/v2/graph/schools/:school_id?$expand=products', async () => {
+    //     const school = await edlink.use(token_set).schools.fetch('32f73251-be34-499a-8f54-dd6906bc9759', { expand: ['products'] });
+    //     expect(school).toBeDefined();
+    // });
+
+    it.only('/api/v2/graph/classes/:class_id?$expand=products', async () => {
+        const _class = await edlink.use(token_set).classes.fetch('fc8ba5f4-1b10-42a8-9929-75790d601912', { expand: ['products'] });
+        console.log(_class.products?.[0]);
+        expect(_class.products).toBeDefined();
+        expect(_class.products).toBeInstanceOf(Array);
+        expect(_class.products!.length).toBeGreaterThan(0);
+    });
+
+    it.only('/api/v2/graph/people/:person_id?$expand=products', async () => {
+        const person = await edlink.use(token_set).people.fetch('f7ba3e9d-b1f1-451a-802b-f072a3482c55', { expand: ['products'] });
+        console.log(person.products?.[0]);
+        expect(person).toBeDefined();
+        expect(person.products).toBeInstanceOf(Array);
+        expect(person.products!.length).toBeGreaterThan(0);
+    });
 });

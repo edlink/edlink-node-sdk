@@ -189,3 +189,12 @@ export type RequestOptions = {
     filter?: Record<string, any>;
     expand?: string[];
 };
+
+export enum ProductState {
+    Active = 'active',
+    Inactive = 'inactive',
+    Upcoming = 'upcoming',
+    Development = 'development',
+    Sunsetting = 'sunsetting',
+    Deprecated = 'deprecated'
+}
