@@ -71,7 +71,7 @@ export interface Session {
      * @type {string}
      * @memberof Session
      */
-    schoo_id: string | null;
+    school_id: string | null;
     /**
      * 
      * @type {string}

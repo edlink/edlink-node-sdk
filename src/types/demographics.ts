@@ -35,7 +35,7 @@ export interface Demographics {
      * @type {string}
      * @memberof Demographics
      */
-    country_if_birth: string | null;
+    country_of_birth: string | null;
     /**
      * 
      * @type {string}
