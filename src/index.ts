@@ -7,7 +7,6 @@ import { Auth } from './user/auth';
 
 export * from './types';
 
-
 export type EdlinkConfig = {
     version?: number;
     client_id: string;
@@ -80,6 +79,6 @@ export class Edlink {
             redirect_uri: redirect_uri,
             state: state
         };
-        return `https://ed.link/api/authentication/login?${serialize(params)}`;
+        return `https://ed.link/sso/login?${serialize(params)}`;
     }
 }
