@@ -163,27 +163,31 @@ export enum TokenSetType {
     Person = 'person'
 }
 
-export type TokenSet = {
+export type BaseTokenSet = {
     type: TokenSetType;
+    token_type?: 'Bearer';
     access_token: string;
     refresh_token?: string;
-    expiration_date?: Date;
+    context?: Record<string, any>;
 };
 
 /**
  * Important note: If you do not provide a refresh token the SDK will not be able to refresh the token for you and requests made an hour after the initial token exchange will fail
  */
-export type PersonTokenSet = TokenSet & {
+export type PersonTokenSet = BaseTokenSet & {
     type: TokenSetType.Person;
     access_token?: string;
     refresh_token?: string;
+    expires_in?: Date;
     expiration_date?: Date;
 };
 
-export type IntegrationTokenSet = TokenSet & {
+export type IntegrationTokenSet = BaseTokenSet & {
     type: TokenSetType.Integration;
     access_token: string;
 };
+
+export type TokenSet = PersonTokenSet | IntegrationTokenSet;
 
 export type RequestOptions = {
     limit?: number;
