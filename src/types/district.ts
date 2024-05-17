@@ -56,16 +56,10 @@ export interface District {
     locale: string | null;
     /**
      * 
-     * @type {any}
-     * @memberof District
-     */
-    location_id: any | null;
-    /**
-     * 
      * @type {Address}
      * @memberof District
      */
-    location: Address | null;
+    address: Address | null;
     /**
      * 
      * @type {string}
