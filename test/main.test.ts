@@ -50,13 +50,12 @@ describe('User', () => {
                 for await (const submission of edlink
                     .use(refresh)
                     .submissions.list(_class.id, assignment.id, { limit: 1 })) {
-                    console.log(submission);
                     // Generate a new grade for that submission and attempt to update it
-                    // const new_grade = Math.floor(Math.random() * 100);
-                    // const new_submissions = await edlink
-                    //     .use(refresh)
-                    //     .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
-                    // expect(new_submissions.grade_points).toBe(new_grade);
+                    const new_grade = Math.floor(Math.random() * 100);
+                    const new_submissions = await edlink
+                        .use(refresh)
+                        .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
+                    expect(new_submissions.grade_points).toBe(new_grade);
                 }
             }
         }
@@ -106,35 +105,26 @@ describe('Error Handling', () => {
         await expect(edlink.use(token_set).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
             'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.'
         );
-
-        edlink
-            .use(token_set)
-            .schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')
-            .catch(error => {
-                console.log(error.message); // School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.
-                console.log(error.code); // NOT_FOUND
-                console.log(error.status); // 400
-            });
     });
 });
 
 describe('Graph', () => {
     it('/api/up', async () => {
         expect(await Edlink.up()).toBeTruthy();
-        console.log(edlink.loginUrl({ redirect_uri: 'https://oauthdebugger.com/debug' }));
     });
 
-    it('/api/v2/graph/licenses', async () => {
-        for await (const license of edlink.use(token_set).licenses.list({ limit: 1 })) {
-            console.log(license);
-        }
-    });
+    // TODO:
+    // it('/api/v2/graph/licenses', async () => {
+    //     for await (const license of edlink.use(token_set).licenses.list({ limit: 1 })) {
+    //         console.log(license);
+    //     }
+    // });
 
-    it('/api/v2/graph/classes', async () => {
-        for await (const _class of edlink.use(token_set).classes.list({ limit: 1 })) {
-            console.log(_class);
-        }
-    });
+    // it('/api/v2/graph/classes', async () => {
+    //     for await (const _class of edlink.use(token_set).classes.list({ limit: 1 })) {
+    //         console.log(_class);
+    //     }
+    // });
 
     // Districts
 
@@ -155,7 +145,6 @@ describe('Graph', () => {
     it('/api/v2/graph/districts/:district_id/administrators', async () => {
         for await (const district of edlink.use(token_set).districts.list({ limit: 1 })) {
             for await (const admin of edlink.use(token_set).districts.listAdministrators(district.id, { limit: 1 })) {
-                console.log('ADMIN HERE', admin);
                 expect(admin).toBeDefined();
             }
         }
@@ -184,7 +173,6 @@ describe('Graph', () => {
         for await (const session of edlink.use(token_set).sessions.list()) {
             data.set(session.id, session);
         }
-        console.log('section', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/sessions/:session_id', async () => {
@@ -202,7 +190,6 @@ describe('Graph', () => {
         for await (const course of edlink.use(token_set).courses.list()) {
             data.set(course.id, course);
         }
-        console.log('course', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/courses/:course_id', async () => {
@@ -230,7 +217,6 @@ describe('Graph', () => {
         for await (const _class of edlink.use(token_set).classes.list()) {
             data.set(_class.id, _class);
         }
-        console.log('class', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/classes/:class_id/sections', async () => {
@@ -240,7 +226,6 @@ describe('Graph', () => {
                 data.set(section.id, section);
             }
         }
-        console.log('class/section', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/classes/:class_id/enrollments', async () => {
@@ -250,7 +235,6 @@ describe('Graph', () => {
                 data.set(enrollment.id, enrollment);
             }
         }
-        console.log('class/enrollment', Array.from(data.entries())[0]);
     });
 
     // Sections
@@ -260,7 +244,6 @@ describe('Graph', () => {
         for await (const section of edlink.use(token_set).sections.list()) {
             data.set(section.id, section);
         }
-        console.log('section', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/sections/:section_id', async () => {
@@ -285,7 +268,6 @@ describe('Graph', () => {
             })) {
                 data.set(person.id, person);
             }
-            console.log('person', Array.from(data.entries()));
         } catch(error) {
             console.log('ERROR', error);
         }
@@ -365,7 +347,6 @@ describe('Graph', () => {
         for await (const enrollment of edlink.use(token_set).enrollments.list()) {
             data.set(enrollment.id, enrollment);
         }
-        console.log('enrollment', Array.from(data.entries())[0]);
     });
 
     it('/api/v2/graph/enrollments/:enrollment_id', async () => {
@@ -384,7 +365,6 @@ describe('Graph', () => {
         for await (const agent of edlink.use(token_set).agents.list()) {
             data.set(agent.id, agent);
         }
-        console.log('agent', Array.from(data.entries())[0]);
     });
 
     // it('/api/v2/graph/agents/:agent_id', async () => {
@@ -404,7 +384,6 @@ describe('Graph', () => {
 
     it('/api/v2/graph/classes/:class_id?$expand=products', async () => {
         const _class = await edlink.use(token_set).classes.fetch('fc8ba5f4-1b10-42a8-9929-75790d601912', { expand: ['products'] });
-        console.log(_class.products?.[0]);
         expect(_class.products).toBeDefined();
         expect(_class.products).toBeInstanceOf(Array);
         expect(_class.products!.length).toBeGreaterThan(0);
@@ -412,7 +391,6 @@ describe('Graph', () => {
 
     it('/api/v2/graph/people/:person_id?$expand=products', async () => {
         const person = await edlink.use(token_set).people.fetch('f7ba3e9d-b1f1-451a-802b-f072a3482c55', { expand: ['products'] });
-        console.log(person.products?.[0]);
         expect(person).toBeDefined();
         expect(person.products).toBeInstanceOf(Array);
         expect(person.products!.length).toBeGreaterThan(0);
