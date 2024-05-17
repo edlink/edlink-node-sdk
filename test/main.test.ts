@@ -106,15 +106,6 @@ describe('Error Handling', () => {
         await expect(edlink.use(token_set).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
             'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.'
         );
-
-        edlink
-            .use(token_set)
-            .schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')
-            .catch(error => {
-                console.log(error.message); // School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this integration.
-                console.log(error.code); // NOT_FOUND
-                console.log(error.status); // 400
-            });
     });
 });
 
