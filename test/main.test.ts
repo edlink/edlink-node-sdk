@@ -51,11 +51,11 @@ describe('User', () => {
                     .use(refresh)
                     .submissions.list(_class.id, assignment.id, { limit: 1 })) {
                     // Generate a new grade for that submission and attempt to update it
-                    // const new_grade = Math.floor(Math.random() * 100);
-                    // const new_submissions = await edlink
-                    //     .use(refresh)
-                    //     .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
-                    // expect(new_submissions.grade_points).toBe(new_grade);
+                    const new_grade = Math.floor(Math.random() * 100);
+                    const new_submissions = await edlink
+                        .use(refresh)
+                        .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
+                    expect(new_submissions.grade_points).toBe(new_grade);
                 }
             }
         }
