@@ -57,16 +57,10 @@ export interface School {
     locale: string | null;
     /**
      * 
-     * @type {any}
-     * @memberof School
-     */
-    location_id: any | null;
-    /**
-     * 
      * @type {Address}
      * @memberof School
      */
-    location: Address | null;
+    address: Address | null;
     /**
      * 
      * @type {string}
