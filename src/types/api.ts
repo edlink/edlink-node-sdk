@@ -77,7 +77,6 @@ export class BearerTokenAPI {
         // Make request
         const response = await this.axios.request(config).catch(error => {
             // TODO: Some custom error handling?
-                console.log(error.response.data)
             if (error.response.data && error.response.data.$errors && error.response.data.$errors.length > 0) {
                 const $errors = error.response.data.$errors;
                 for (const _error of $errors) {
@@ -86,7 +85,6 @@ export class BearerTokenAPI {
                 if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
                     console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
                 }
-                console.log($errors[0])
                 throw new EdlinkError({
                     ...$errors[0],
                     status: error.response.status,

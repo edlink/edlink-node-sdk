@@ -62,8 +62,10 @@ describe('User', () => {
 
         const profile = await edlink.use(refresh).my.profile();
         const integration = await edlink.use(refresh).my.integration();
+        const source = await edlink.use(refresh).my.source();
         expect(profile).toBeDefined();
         expect(integration).toBeDefined();
+        expect(source).toBeDefined();
     });
 });
 
@@ -261,14 +263,12 @@ describe('Graph', () => {
         try {
             for await (const person of edlink.use(token_set).people.list({
                 filter: {
-                    first_name: [
-                        { operator: 'starts with', value: 'Lil' }
-                    ]
+                    first_name: [{ operator: 'starts with', value: 'Lil' }]
                 }
             })) {
                 data.set(person.id, person);
             }
-        } catch(error) {
+        } catch (error) {
             console.log('ERROR', error);
         }
     });
@@ -383,14 +383,18 @@ describe('Graph', () => {
     // });
 
     it('/api/v2/graph/classes/:class_id?$expand=products', async () => {
-        const _class = await edlink.use(token_set).classes.fetch('fc8ba5f4-1b10-42a8-9929-75790d601912', { expand: ['products'] });
+        const _class = await edlink
+            .use(token_set)
+            .classes.fetch('fc8ba5f4-1b10-42a8-9929-75790d601912', { expand: ['products'] });
         expect(_class.products).toBeDefined();
         expect(_class.products).toBeInstanceOf(Array);
         expect(_class.products!.length).toBeGreaterThan(0);
     });
 
     it('/api/v2/graph/people/:person_id?$expand=products', async () => {
-        const person = await edlink.use(token_set).people.fetch('f7ba3e9d-b1f1-451a-802b-f072a3482c55', { expand: ['products'] });
+        const person = await edlink
+            .use(token_set)
+            .people.fetch('f7ba3e9d-b1f1-451a-802b-f072a3482c55', { expand: ['products'] });
         expect(person).toBeDefined();
         expect(person.products).toBeInstanceOf(Array);
         expect(person.products!.length).toBeGreaterThan(0);
