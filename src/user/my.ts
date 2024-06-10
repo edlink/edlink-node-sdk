@@ -1,4 +1,4 @@
-import { BearerTokenAPI, Person } from '../types';
+import { BearerTokenAPI, Integration, Person, Source } from '../types';
 
 export class My {
     constructor(private api: BearerTokenAPI) {}
@@ -15,7 +15,11 @@ export class My {
      * Get the integration for the current TokenSet.
      * @returns The integration accociated with the TokenSet provided
      */
-    integration(): Promise<any> {
+    integration(): Promise<Integration> {
         return this.api.request(`/integration`);
+    }
+
+    source(): Promise<Source> {
+        return this.api.request(`/source`);
     }
 }

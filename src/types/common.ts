@@ -160,8 +160,9 @@ export enum Role {
 
 export enum TokenSetType {
     Integration = 'integration',
-    Person = 'person'
-}
+    Person = 'person',
+    Application = 'application'
+};
 
 export type BaseTokenSet = {
     type: TokenSetType;
@@ -202,4 +203,61 @@ export enum ProductState {
     Development = 'development',
     Sunsetting = 'sunsetting',
     Deprecated = 'deprecated'
-}
+};
+
+export enum IntegrationState {
+    Requested = 'requested',
+    Inactive = 'inactive',
+    Active = 'active',
+    Error = 'error',
+    Disabled = 'disabled',
+    Paused = 'paused',
+    Pending = 'pending',
+    Scheduled = 'scheduled'
+};
+
+export type Integration = {
+    state: IntegrationState;
+    id: string;
+    created_date: string;
+    updated_date: string;
+    permissions: string[];
+    scope: string;
+    start_date: Date;
+    end_date: Date;
+    locked: boolean;
+    application_id: string;
+    source_id: string;
+    destination_id: string;
+    region_id: string;
+};
+
+export enum SourceState {
+    Inactive = 'inactive', // Waiting to be validated (set when configuration changes)
+    Active = 'active', // First sync was successful, scheduled to sync regularly
+    Error = 'error', // Validation or sync failed
+    Disabled = 'disabled', // Disabled manually
+    Destroyed = 'destroyed' // Basically just waiting for cleanup.
+};
+
+export type Source = {
+    state: SourceState;
+    id: string;
+    created_date: string;
+    updated_date: string;
+    name: string;
+    sync_interval: number;
+    provider_id: string;
+    properties: Record<string, any>;
+    team_id: string;
+    provider: {
+        active: boolean;
+        requires_administrator_login: boolean;
+        requires_administrator_consent: boolean;
+        requires_remote_configuration: boolean;
+        allows_data_sync: boolean;
+        id: string;
+        name: string;
+        application: string;
+    }
+};
