@@ -1,4 +1,4 @@
-import { BearerTokenAPI, Assignment, RequestOptions } from '../types';
+import { BearerTokenAPI, Assignment, RequestOptionsPaging, RequestOptionsBase } from '../types';
 
 export class Assignments {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class Assignments {
      * @param class_id The UUID of the class
      * @param options provide a `limit` for the max number of results
      */
-    public async *list(class_id: string, options: RequestOptions = {}): AsyncGenerator<Assignment> {
+    public async *list(class_id: string, options: RequestOptionsPaging = {}): AsyncGenerator<Assignment> {
         yield* this.api.paginate<Assignment>(`/classes/${class_id}/assignments`, options);
     }
 
@@ -19,7 +19,7 @@ export class Assignments {
      * @returns The requested assignment
      * @throws `404` if the assignment does not exist
      */
-    public async fetch(class_id: string, assignment_id: string, options: RequestOptions): Promise<Assignment> {
+    public async fetch(class_id: string, assignment_id: string, options: RequestOptionsBase = {}): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {}, options);
     }
 
@@ -30,11 +30,11 @@ export class Assignments {
      * @returns The created assignment
      * @throws `400` if the assignment is invalid
      */
-    public async create(class_id: string, assignment: Partial<Assignment>): Promise<Assignment> {
+    public async create(class_id: string, assignment: Partial<Assignment>, options: RequestOptionsBase = {}): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments`, {
             method: 'POST',
             data: assignment
-        });
+        }, options);
     }
 
     /**

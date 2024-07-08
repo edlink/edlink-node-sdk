@@ -12,7 +12,8 @@ import {
     TokenSetType,
     IntegrationTokenSet,
     Agent,
-    PersonTokenSet
+    PersonTokenSet,
+    Product
 } from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;

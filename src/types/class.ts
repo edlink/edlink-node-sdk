@@ -18,13 +18,13 @@ export interface Class {
      * @type {Date}
      * @memberof Class
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Class
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

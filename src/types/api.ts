@@ -55,13 +55,8 @@ export class BearerTokenAPI {
             this.token_set.refresh_token = refresh_token;
             this.token_set.expiration_date = new Date(Date.now() + 3600 * 1000);
         }
-        const formatted_options: { $filter?: string; $expand?: string[] } = {};
-        if (options.filter) {
-            formatted_options['$filter'] = JSON.stringify(options.filter);
-        }
-        if (options.expand) {
-            formatted_options['$expand'] = options.expand;
-        }
+        // Format options into request params
+        const formatted_options = this.formatParams(options);
         // Set url
         config.url = endpoint.startsWith('http')
             ? endpoint
@@ -150,5 +145,36 @@ export class BearerTokenAPI {
         expiration_date.setMinutes(expiration_date.getMinutes() - 5);
 
         return current_date > expiration_date;
+    }
+    
+    public formatParams(params: RequestOptions): { $idempotency?: string; $filter?: string; $expand?: string[] } & Record<string, any> {
+        const formatted: {
+            $idempotency?: string;
+            $filter?: string;
+            $expand?: string[];
+        } & Record<string, any> = {};
+    
+        const mappings: Record<string, string | { prop: string; mod: (value: any) => any }> = {
+            idempotency: '$idempotency',
+            filter: { prop: '$filter', mod: JSON.stringify },
+            expand: '$expand'
+        }
+
+        for (const [key, value] of Object.entries(params)) {
+            const mapping = mappings[key];
+
+            if (mapping) {
+                if (typeof mapping === 'string') {
+                    formatted[mapping] = value;
+                } else {
+                    const { prop, mod } = mapping;
+                    formatted[prop] = mod(value);
+                }
+            } else {
+                formatted[key] = value;
+            }
+        }
+
+        return formatted;
     }
 }

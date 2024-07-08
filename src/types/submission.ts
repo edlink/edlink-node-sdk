@@ -18,14 +18,14 @@ import { Attachment } from ".";
      * @type {Date}
      * @memberof Submission
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * When the object was last updated in the source.
      * @type {Date}
      * @memberof Submission
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}
@@ -87,7 +87,7 @@ import { Attachment } from ".";
      * @type {Date}
      * @memberof Submission
      */
-    override_due_date: Date;
+    override_due_date: string;
     /**
      * 
      * The UUID of the Person who grades the submission.
@@ -123,7 +123,7 @@ export interface Attempt {
      * @type {Date}
      * @memberof Attempt
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Array<Attachment>}
