@@ -26,7 +26,8 @@ const edlink = new Edlink({
     version: 2,
     // client_id: 'e6504765-238a-418f-871a-2e789c1f26f5',
     client_id: '36ad8864-d789-45b6-9df8-334c2f32445b',
-    client_secret: process.env.CLIENT_SECRET!
+    client_secret: process.env.CLIENT_SECRET!,
+    log_level: 'silent'
 });
 
 // jest.setTimeout(10000);
@@ -402,7 +403,7 @@ describe('Graph', () => {
 });
 
 describe('Request Options', () => {
-    it.only('$idempotency', async () => {
+    it('$idempotency', async () => {
         // Generate a random idempotency key
         const idempotency_key = Math.random().toString(36).substring(7);
 

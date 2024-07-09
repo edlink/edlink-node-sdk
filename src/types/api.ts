@@ -74,11 +74,13 @@ export class BearerTokenAPI {
             // TODO: Some custom error handling?
             if (error.response.data && error.response.data.$errors && error.response.data.$errors.length > 0) {
                 const $errors = error.response.data.$errors;
-                for (const _error of $errors) {
-                    console.warn(`Edlink API Error: ${_error.code} ${_error.message}`);
-                }
-                if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
-                    console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
+                if (this.edlink.log_level === 'debug') {
+                    for (const _error of $errors) {
+                        console.warn(`Edlink API Error: ${_error.code} ${_error.message}`);
+                    }
+                    if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
+                        console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
+                    }
                 }
                 throw new EdlinkError({
                     ...$errors[0],
@@ -89,8 +91,10 @@ export class BearerTokenAPI {
             throw error;
         });
         if (response.data.$warnings) {
-            for (const warning of response.data.$warnings) {
-                console.warn(`Edlink API Warning: ${warning.code} ${warning.message}`);
+            if (this.edlink.log_level === 'debug') {
+                for (const warning of response.data.$warnings) {
+                    console.warn(`Edlink API Warning: ${warning.code} ${warning.message}`);
+                }
             }
         }
         return raw ? response.data : response.data.$data;
