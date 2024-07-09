@@ -17,13 +17,13 @@ export interface Session {
      * @type {Date}
      * @memberof Session
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Session
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

@@ -18,14 +18,14 @@ import { Identifier } from ".";
      * @type {Date}
      * @memberof Category
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * When the object was last updated in the source.
      * @type {Date}
      * @memberof Category
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

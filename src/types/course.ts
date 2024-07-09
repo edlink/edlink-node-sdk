@@ -17,13 +17,13 @@ export interface Course {
      * @type {Date}
      * @memberof Course
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Course
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

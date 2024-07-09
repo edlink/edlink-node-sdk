@@ -1,4 +1,4 @@
-import { Attempt, BearerTokenAPI, RequestOptions, Submission } from '../types';
+import { Attempt, BearerTokenAPI, RequestOptionsBase, RequestOptionsGet, RequestOptionsPaging, RequestOptionsPost, Submission } from '../types';
 
 export class Submissions {
     constructor(private api: BearerTokenAPI) {}
@@ -13,7 +13,7 @@ export class Submissions {
     public async *list(
         class_id: string,
         assignment_id: string,
-        options: RequestOptions = {}
+        options: RequestOptionsPaging = {}
     ): AsyncGenerator<Submission> {
         yield* this.api.paginate<Submission>(`/classes/${class_id}/assignments/${assignment_id}/submissions`, options);
     }
@@ -29,7 +29,7 @@ export class Submissions {
         class_id: string,
         assignment_id: string,
         submission_id: string,
-        options: RequestOptions = {}
+        options: RequestOptionsGet = {}
     ): Promise<Submission> {
         return this.api.request(
             `/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}`,
@@ -46,11 +46,11 @@ export class Submissions {
      * @param attempt The attempt to submit
      * @returns The updated submission
      */
-    public async submit(class_id: string, assignment_id: string, attempt: Partial<Attempt>): Promise<Submission> {
+    public async submit(class_id: string, assignment_id: string, attempt: Partial<Attempt>, options: RequestOptionsPost = {}): Promise<Submission> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/submit`, {
             method: 'POST',
             data: attempt
-        });
+        }, options);
     }
 
     /**
@@ -59,10 +59,10 @@ export class Submissions {
      * @param assignment_id The UUID of the assignment
      * @returns The reclaimed submission
      */
-    public async reclaim(class_id: string, assignment_id: string): Promise<Submission> {
+    public async reclaim(class_id: string, assignment_id: string, options: RequestOptionsPost = {}): Promise<Submission> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/reclaim`, {
             method: 'POST'
-        });
+        }, options);
     }
 
     /**
@@ -72,13 +72,10 @@ export class Submissions {
      * @param submission_id The UUID of the submission
      * @returns The returned submission
      */
-    public async return(class_id: string, assignment_id: string, submission_id: string): Promise<Submission> {
-        return this.api.request(
-            `/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}/return`,
-            {
-                method: 'POST'
-            }
-        );
+    public async return(class_id: string, assignment_id: string, submission_id: string, options: RequestOptionsPost = {}): Promise<Submission> {
+        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}/return`, {
+            method: 'POST'
+        }, options);
     }
 
     /**
@@ -94,11 +91,12 @@ export class Submissions {
         class_id: string,
         assignment_id: string,
         submission_id: string,
-        submission: Partial<Submission>
+        submission: Partial<Submission>,
+        options: RequestOptionsBase = {}
     ): Promise<Submission> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}`, {
             method: 'PATCH',
             data: submission
-        });
+        }, options);
     }
 }

@@ -12,13 +12,13 @@ export interface Product {
      * @type {Date}
      * @memberof Product
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Product
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {string}

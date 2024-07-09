@@ -190,11 +190,24 @@ export type IntegrationTokenSet = BaseTokenSet & {
 
 export type TokenSet = PersonTokenSet | IntegrationTokenSet;
 
-export type RequestOptions = {
+export type RequestOptionsPaging = {
     limit?: number;
     filter?: Record<string, any>;
+} & RequestOptionsGet;
+
+export type RequestOptionsGet = {
     expand?: string[];
+} & RequestOptionsBase;
+
+export type RequestOptionsPost = {
+    idempotency?: string;
+} & RequestOptionsBase;
+
+export type RequestOptionsBase = {
+    properties?: string[];
 };
+
+export type RequestOptions = RequestOptionsPaging | RequestOptionsGet | RequestOptionsBase;
 
 export enum ProductState {
     Active = 'active',
@@ -223,8 +236,8 @@ export type Integration = {
     updated_date: string;
     permissions: string[];
     scope: string;
-    start_date: Date;
-    end_date: Date;
+    start_date: string;
+    end_date: string;
     locked: boolean;
     application_id: string;
     source_id: string;

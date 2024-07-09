@@ -1,4 +1,4 @@
-import { BearerTokenAPI, Category, RequestOptions } from '../types';
+import { BearerTokenAPI, Category, RequestOptionsBase, RequestOptionsGet, RequestOptionsPaging, RequestOptionsPost } from '../types';
 
 export class Categories {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class Categories {
      * @param class_id The UUID of the class
      * @param options Provide a `limit` for the max number of results
      */
-    public async *list(class_id: string, options: RequestOptions = {}): AsyncGenerator<Category> {
+    public async *list(class_id: string, options: RequestOptionsPaging = {}): AsyncGenerator<Category> {
         yield* this.api.paginate<Category>(`/classes/${class_id}/categories`, options);
     }
 
@@ -19,7 +19,7 @@ export class Categories {
      * @returns The requested category
      * @throws 404 if the category does not exist
      */
-    public async fetch(class_id: string, category_id: string, options: RequestOptions = {}): Promise<Category> {
+    public async fetch(class_id: string, category_id: string, options: RequestOptionsGet = {}): Promise<Category> {
         return this.api.request(`/classes/${class_id}/categories/${category_id}`, {}, options);
     }
 
@@ -29,11 +29,11 @@ export class Categories {
      * @param category The category to create
      * @returns The created category
      */
-    public async create(class_id: string, category: Category): Promise<Category> {
+    public async create(class_id: string, category: Category, options: RequestOptionsPost = {}): Promise<Category> {
         return this.api.request(`/classes/${class_id}/categories`, {
             method: 'POST',
             data: category
-        });
+        }, options);
     }
 
     /**
@@ -44,11 +44,11 @@ export class Categories {
      * @returns The updated category
      * @throws `400` if the category is invalid
      */
-    public async update(class_id: string, category_id: string, category: Partial<Category>): Promise<Category> {
+    public async update(class_id: string, category_id: string, category: Partial<Category>, options: RequestOptionsBase = {}): Promise<Category> {
         return this.api.request(`/classes/${class_id}/categories/${category_id}`, {
             method: 'PATCH',
             data: category
-        });
+        }, options);
     }
 
     /**
@@ -58,9 +58,9 @@ export class Categories {
      * @returns `200` if the category was deleted
      * @throws `404` if the category does not exist
      */
-    public async delete(class_id: string, category_id: string): Promise<void> {
+    public async delete(class_id: string, category_id: string, options: RequestOptionsBase = {}): Promise<void> {
         return this.api.request(`/classes/${class_id}/categories/${category_id}`, {
             method: 'DELETE'
-        });
+        }, options);
     }
 }

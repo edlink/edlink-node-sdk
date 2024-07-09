@@ -23,13 +23,13 @@ export interface Event {
      * @type {Date}
      * @memberof Event
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Event
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}
@@ -41,7 +41,7 @@ export interface Event {
      * @type {Date}
      * @memberof Event
      */
-    date: Date;
+    date: string;
     /**
      * 
      * @type {string}

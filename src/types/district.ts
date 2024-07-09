@@ -17,13 +17,13 @@ export interface District {
      * @type {Date}
      * @memberof District
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof District
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

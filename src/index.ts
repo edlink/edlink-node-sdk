@@ -11,12 +11,14 @@ export type EdlinkConfig = {
     version?: number;
     client_id: string;
     client_secret: string;
+    log_level?: 'debug' | 'silent';
 };
 
 export class Edlink {
     version: number;
     client_id: string;
     client_secret: string;
+    log_level: 'debug' | 'silent' = 'debug';
 
     public auth: Auth;
 
@@ -26,6 +28,7 @@ export class Edlink {
         this.version = config.version ?? 2;
         this.client_id = config.client_id;
         this.client_secret = config.client_secret;
+        this.log_level = config.log_level ?? 'debug';
         // Build API interfaces
         this.auth = new Auth(this);
     }

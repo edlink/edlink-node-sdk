@@ -18,13 +18,13 @@ export interface Person {
      * @type {Date}
      * @memberof Person
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Person
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

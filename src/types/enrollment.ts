@@ -17,13 +17,13 @@ export interface Enrollment {
      * @type {Date}
      * @memberof Enrollment
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Enrollment
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

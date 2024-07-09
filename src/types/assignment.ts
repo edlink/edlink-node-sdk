@@ -19,14 +19,14 @@ import { Attachment } from ".";
      * @memberof Assignment
      * @description The date the assignment was created.
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Assignment
      * @description The date the assignment was last updated.
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}
@@ -86,28 +86,28 @@ import { Attachment } from ".";
      * @memberof Assignment
      * @description The date the assignment is due.
      */
-    due_date: Date;
+    due_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Assignment
      * @description The date the assignment is displayed.
      */
-    display_date: Date;
+    display_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Assignment
      * @description The date the assignment is available.
      */
-    start_date: Date;
+    start_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Assignment
      * @description The date the assignment is no longer available.
      */
-    end_date: Date;
+    end_date: string;
     /**
      * 
      * @type {number}

@@ -55,13 +55,8 @@ export class BearerTokenAPI {
             this.token_set.refresh_token = refresh_token;
             this.token_set.expiration_date = new Date(Date.now() + 3600 * 1000);
         }
-        const formatted_options: { $filter?: string; $expand?: string[] } = {};
-        if (options.filter) {
-            formatted_options['$filter'] = JSON.stringify(options.filter);
-        }
-        if (options.expand) {
-            formatted_options['$expand'] = options.expand;
-        }
+        // Format options into request params
+        const formatted_options = this.formatParams(options);
         // Set url
         config.url = endpoint.startsWith('http')
             ? endpoint
@@ -79,11 +74,13 @@ export class BearerTokenAPI {
             // TODO: Some custom error handling?
             if (error.response.data && error.response.data.$errors && error.response.data.$errors.length > 0) {
                 const $errors = error.response.data.$errors;
-                for (const _error of $errors) {
-                    console.warn(`Edlink API Error: ${_error.code} ${_error.message}`);
-                }
-                if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
-                    console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
+                if (this.edlink.log_level === 'debug') {
+                    for (const _error of $errors) {
+                        console.warn(`Edlink API Error: ${_error.code} ${_error.message}`);
+                    }
+                    if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
+                        console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
+                    }
                 }
                 throw new EdlinkError({
                     ...$errors[0],
@@ -94,8 +91,10 @@ export class BearerTokenAPI {
             throw error;
         });
         if (response.data.$warnings) {
-            for (const warning of response.data.$warnings) {
-                console.warn(`Edlink API Warning: ${warning.code} ${warning.message}`);
+            if (this.edlink.log_level === 'debug') {
+                for (const warning of response.data.$warnings) {
+                    console.warn(`Edlink API Warning: ${warning.code} ${warning.message}`);
+                }
             }
         }
         return raw ? response.data : response.data.$data;
@@ -150,5 +149,38 @@ export class BearerTokenAPI {
         expiration_date.setMinutes(expiration_date.getMinutes() - 5);
 
         return current_date > expiration_date;
+    }
+    
+    public formatParams(params: RequestOptions): Record<string, any> {
+        const formatted: {
+            $idempotency?: string;
+            $filter?: string;
+            $expand?: string;
+            $properties?: string;
+        } & Record<string, any> = {};
+    
+        const mappings: Record<string, string | { prop: string; mod: (value: any) => any }> = {
+            idempotency: '$idempotency',
+            filter: { prop: '$filter', mod: JSON.stringify },
+            properties: { prop: '$properties', mod: (value: string[]) => value.join(',') },
+            expand: { prop: '$expand', mod: (value: string[]) => value.join(',') },
+        }
+
+        for (const [key, value] of Object.entries(params)) {
+            const mapping = mappings[key];
+
+            if (mapping) {
+                if (typeof mapping === 'string') {
+                    formatted[mapping] = value;
+                } else {
+                    const { prop, mod } = mapping;
+                    formatted[prop] = mod(value);
+                }
+            } else {
+                formatted[key] = value;
+            }
+        }
+
+        return formatted;
     }
 }

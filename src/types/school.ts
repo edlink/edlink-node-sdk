@@ -18,13 +18,13 @@ export interface School {
      * @type {Date}
      * @memberof School
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof School
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

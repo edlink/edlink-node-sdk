@@ -17,13 +17,13 @@ export interface Agent {
      * @type {Date}
      * @memberof Agent
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Agent
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}

@@ -17,13 +17,13 @@ export interface Section {
      * @type {Date}
      * @memberof Section
      */
-    created_date: Date;
+    created_date: string;
     /**
      * 
      * @type {Date}
      * @memberof Section
      */
-    updated_date: Date;
+    updated_date: string;
     /**
      * 
      * @type {any}
