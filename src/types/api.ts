@@ -151,17 +151,19 @@ export class BearerTokenAPI {
         return current_date > expiration_date;
     }
     
-    public formatParams(params: RequestOptions): { $idempotency?: string; $filter?: string; $expand?: string[] } & Record<string, any> {
+    public formatParams(params: RequestOptions): Record<string, any> {
         const formatted: {
             $idempotency?: string;
             $filter?: string;
-            $expand?: string[];
+            $expand?: string;
+            $properties?: string;
         } & Record<string, any> = {};
     
         const mappings: Record<string, string | { prop: string; mod: (value: any) => any }> = {
             idempotency: '$idempotency',
             filter: { prop: '$filter', mod: JSON.stringify },
-            expand: '$expand'
+            properties: { prop: '$properties', mod: (value: string[]) => value.join(',') },
+            expand: { prop: '$expand', mod: (value: string[]) => value.join(',') },
         }
 
         for (const [key, value] of Object.entries(params)) {

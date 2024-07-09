@@ -203,7 +203,9 @@ export type RequestOptionsPost = {
     idempotency?: string;
 } & RequestOptionsBase;
 
-export type RequestOptionsBase = {};
+export type RequestOptionsBase = {
+    properties?: string[];
+};
 
 export type RequestOptions = RequestOptionsPaging | RequestOptionsGet | RequestOptionsBase;
 
