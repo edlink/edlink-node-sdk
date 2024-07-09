@@ -13,7 +13,6 @@ import {
     IntegrationTokenSet,
     Agent,
     PersonTokenSet,
-    Product
 } from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;
@@ -399,5 +398,43 @@ describe('Graph', () => {
         expect(person).toBeDefined();
         expect(person.products).toBeInstanceOf(Array);
         expect(person.products!.length).toBeGreaterThan(0);
+    });
+});
+
+describe('Request Options', () => {
+    it.only('$idempotency', async () => {
+        // Generate a random idempotency key
+        const idempotency_key = Math.random().toString(36).substring(7);
+
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        expect(refresh.access_token).toBeDefined();
+
+        // List users classes (fetching 1)
+        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+            // Attempt to create a new assignment with an idempotency key
+            const assignment = await edlink
+                .use(refresh)
+                .assignments.create(_class.id, {
+                    title: 'Test Assignment',
+                    description: 'Test Assignment Description',
+                    due_date: '2222-01-01T00:00:00Z',
+                    grading_type: 'points',
+                    points_possible: 100
+                }, { idempotency: idempotency_key });
+            expect(assignment).toBeDefined();
+            // Attempt to create a different assignment with the same idempotency key
+            const assignment2 = await edlink
+                .use(refresh)
+                .assignments.create(_class.id, {
+                    title: 'Different Test Assignment',
+                    description: 'This is a different test assignment',
+                    due_date: '2222-01-01T00:00:00Z',
+                    grading_type: 'points',
+                    points_possible: 100
+                }, { idempotency: idempotency_key })
+            // Check that the second assignment is the same as the first
+            expect(assignment2).toBeDefined();
+            expect(assignment2).toStrictEqual(assignment);
+        }
     });
 });

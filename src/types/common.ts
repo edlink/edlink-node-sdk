@@ -193,14 +193,19 @@ export type TokenSet = PersonTokenSet | IntegrationTokenSet;
 export type RequestOptionsPaging = {
     limit?: number;
     filter?: Record<string, any>;
+} & RequestOptionsGet;
+
+export type RequestOptionsGet = {
+    expand?: string[];
 } & RequestOptionsBase;
 
-export type RequestOptionsBase = {
-    expand?: string[];
+export type RequestOptionsPost = {
     idempotency?: string;
-};
+} & RequestOptionsBase;
 
-export type RequestOptions = RequestOptionsPaging | RequestOptionsBase;
+export type RequestOptionsBase = {};
+
+export type RequestOptions = RequestOptionsPaging | RequestOptionsGet | RequestOptionsBase;
 
 export enum ProductState {
     Active = 'active',

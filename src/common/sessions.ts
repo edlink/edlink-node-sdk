@@ -1,5 +1,5 @@
 import { Session } from '..';
-import { BearerTokenAPI, RequestOptions } from '../types';
+import { BearerTokenAPI, RequestOptionsGet, RequestOptionsPaging } from '../types';
 
 export class Sessions {
     constructor(private api: BearerTokenAPI) {}
@@ -8,7 +8,7 @@ export class Sessions {
      * Paginates through all sessions.
      * @param options Provide a `limit` for the max number of results
      */
-    async *list(options: RequestOptions = {}): AsyncGenerator<Session> {
+    async *list(options: RequestOptionsPaging = {}): AsyncGenerator<Session> {
         yield* this.api.paginate<Session>('/sessions', options);
     }
 
@@ -17,7 +17,7 @@ export class Sessions {
      * @param session_id The UUID of the session
      * @returns The requested session
      */
-    fetch(session_id: string, options: RequestOptions = {}): Promise<Session> {
+    fetch(session_id: string, options: RequestOptionsGet = {}): Promise<Session> {
         return this.api.request(`/sessions/${session_id}`, {}, options);
     }
 }

@@ -1,4 +1,4 @@
-import { BearerTokenAPI, Assignment, RequestOptionsPaging, RequestOptionsBase } from '../types';
+import { BearerTokenAPI, Assignment, RequestOptionsPaging, RequestOptionsBase, RequestOptionsGet, RequestOptionsPost } from '../types';
 
 export class Assignments {
     constructor(private api: BearerTokenAPI) {}
@@ -19,7 +19,7 @@ export class Assignments {
      * @returns The requested assignment
      * @throws `404` if the assignment does not exist
      */
-    public async fetch(class_id: string, assignment_id: string, options: RequestOptionsBase = {}): Promise<Assignment> {
+    public async fetch(class_id: string, assignment_id: string, options: RequestOptionsGet = {}): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {}, options);
     }
 
@@ -30,7 +30,7 @@ export class Assignments {
      * @returns The created assignment
      * @throws `400` if the assignment is invalid
      */
-    public async create(class_id: string, assignment: Partial<Assignment>, options: RequestOptionsBase = {}): Promise<Assignment> {
+    public async create(class_id: string, assignment: Partial<Assignment>, options: RequestOptionsPost = {}): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments`, {
             method: 'POST',
             data: assignment
@@ -45,11 +45,11 @@ export class Assignments {
      * @returns The updated assignment
      * @throws `400` if the assignment is invalid
      */
-    public async update(class_id: string, assignment_id: string, assignment: Partial<Assignment>): Promise<Assignment> {
+    public async update(class_id: string, assignment_id: string, assignment: Partial<Assignment>, options: RequestOptionsBase = {}): Promise<Assignment> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {
             method: 'PATCH',
             data: assignment
-        });
+        }, options);
     }
 
     /**
@@ -59,9 +59,9 @@ export class Assignments {
      * @returns `200` if the assignment was deleted
      * @throws `404` if the assignment does not exist
      */
-    public async delete(class_id: string, assignment_id: string): Promise<void> {
+    public async delete(class_id: string, assignment_id: string, options: RequestOptionsBase = {}): Promise<void> {
         return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {
             method: 'DELETE'
-        });
+        }, options);
     }
 }
