@@ -18,7 +18,7 @@ export class Courses {
      * @returns The requested course
      */
     fetch(course_id: string, options: RequestOptionsGet = {}): Promise<Course> {
-        return this.api.request(`/courses/${course_id}`, {}, options);
+        return this.api.request(`/courses/${course_id}`, options);
     }
 
     /**

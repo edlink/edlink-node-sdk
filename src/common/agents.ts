@@ -18,6 +18,6 @@ export class Agents {
      * @throws `404` if the agent does not exist
      */
     fetch(agent_id: string, options: RequestOptionsGet = {}): Promise<Agent> {
-        return this.api.request(`/agents/${agent_id}`, {}, options);
+        return this.api.request(`/agents/${agent_id}`, options);
     }
 }

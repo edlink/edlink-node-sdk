@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { serialize } from './common';
 import { Graph } from './graph';
 import { IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
@@ -67,8 +66,12 @@ export class Edlink {
      * Check the status of the Edlink API
      */
     static async up() {
-        const response = await axios.get('https://ed.link/api/up');
-        return response.data;
+        const response = await fetch('https://ed.link/api/up');
+        if (!response.ok) {
+            throw new Error('Edlink API is down.');
+        } else {
+            return response.text();
+        }
     }
 
     /**

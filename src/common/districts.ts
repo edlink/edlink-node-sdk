@@ -18,7 +18,7 @@ export class Districts {
      * @returns The requested district
      */
     fetch(district_id: string, options: RequestOptionsGet = {}): Promise<District> {
-        return this.api.request(`/districts/${district_id}`, {}, options);
+        return this.api.request(`/districts/${district_id}`, options);
     }
 
     /**

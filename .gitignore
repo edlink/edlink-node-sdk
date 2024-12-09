@@ -1,6 +1,78 @@
-*.log
-.DS_Store
-node_modules
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
 dist
+/tmp
+/out-tsc
+tsconfig.tsbuildinfo
+/target/
+
+# dependencies
+node_modules
+Cargo.lock
+node_modules/
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Yarn
+.yarn/cache
+.yarn/install-state.gz
+.yarn/unplugged
+yarn-error.log
+.pnp.*
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+logFile.log
+matching-logs.log
+matching-logs.js
+matching-logs.json
+matching-logs__*.json
+sourceDataLogs/
+raw_source_data/
+loadTestOutput.json
+.env-old
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# logs
+logs/
+
+# secrets
 .env
-coverage/*
+.test.env
+.envprod
+.envdev
+
+# tests and types
+apps/tango/src/tests/matching/test-cases.ts
+apps/dashboard/common_types
+apps/dashboard/common_types.d.ts
+apps/dashboard/common_types.js
+apps/dashboard/common_types.map
+apps/dashboard/common_types.tsbuildinfo
+*.log
+junit.xml
+.env.test.github-action

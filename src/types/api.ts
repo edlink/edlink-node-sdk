@@ -1,7 +1,14 @@
-import axios, { AxiosRequestConfig, AxiosStatic } from 'axios';
 import { Edlink } from '..';
-import { serialize } from '../common';
+// import { serialize } from '../common';
+import { deepDefaults } from '../utils';
 import { RequestOptions, TokenSet, TokenSetType } from './common';
+
+export type RequestConfig = {
+    url: string;
+    method: string;
+    headers?: Record<string, string>;
+    data?: any;
+}
 
 class EdlinkError extends Error {
     status?: number;
@@ -20,7 +27,6 @@ export class BearerTokenAPI {
     private token_set: TokenSet;
     private version: number;
     private api: 'graph' | 'my';
-    public axios: AxiosStatic;
     public edlink: Edlink;
 
     constructor(edlink: Edlink, token_set: TokenSet) {
@@ -28,24 +34,71 @@ export class BearerTokenAPI {
         this.token_set = token_set;
         this.version = edlink.version;
         this.api = token_set.type === TokenSetType.Integration ? 'graph' : 'my';
-        this.axios = axios;
         this.edlink = edlink;
     }
 
     async request<T>(
-        endpoint: string,
-        config: AxiosRequestConfig = {},
+        config: string | RequestConfig,
         options: RequestOptions = {},
         raw = false
     ): Promise<T> {
+        const defaults: Record<string, any> = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            }
+        };
+        let req: Request;
+        let url: string;
+        // Format options into request params
+        const formatted_options = this.formatParams(options);
+        // If config is a string, set the url
+        if (typeof config === 'string') {
+            url = config;
+        } else {
+            url = config.url;
+        }
+
+        // Set url
+        const formattedUrl = new URL(url.startsWith('http')
+        ? url
+        : `https://ed.link/api/v${this.version}/${this.api}${url}`);
+
+        // Add formatted options to the URL
+        for (const [key, value] of Object.entries(formatted_options)) {
+            formattedUrl.searchParams.append(key, value);
+        }
+
+        // Set url
+        defaults.url = formattedUrl.toString();
+        // Set access token
+        defaults.headers['Authorization'] = `Bearer ${this.token_set.access_token}`;
+
+        if (typeof config === 'string') {
+            req = new Request(formattedUrl, defaults);
+        } else {
+            // Set missing defaults
+            if (config.data !== undefined && config.data !== null) {
+                defaults.body = JSON.stringify(config.data);
+                defaults.headers['Content-Type'] = 'application/json';
+            }
+            // Merge defaults
+            deepDefaults(config, defaults);
+            // Set url
+            config.url = formattedUrl.toString();
+            // Create request
+            req = new Request(config.url, config);
+        }
+
         // Check if the token needs to be refreshed if this is a person token set.
         if (this.token_set.type === TokenSetType.Person && this.token_set.refresh_token && this.requiresTokenRefresh()) {
             // do the token refresh
             const { access_token, refresh_token } = await this.edlink.auth.refresh(this.token_set.refresh_token!)
-                .catch((error) => {
+                .catch(() => {
                     throw new EdlinkError({
                         message: 'Failed to refresh token.',
-                        status: error.response.status,
+                        status: 400,
                         code: 'BAD_REQUEST'
                     });
                 });
@@ -55,55 +108,37 @@ export class BearerTokenAPI {
             this.token_set.refresh_token = refresh_token;
             this.token_set.expiration_date = new Date(Date.now() + 3600 * 1000);
         }
-        // Format options into request params
-        const formatted_options = this.formatParams(options);
-        // Set url
-        config.url = endpoint.startsWith('http')
-            ? endpoint
-            : `https://ed.link/api/v${this.version}/${this.api}${endpoint}?${serialize(formatted_options)}`;
-        // Initialize headers
-        if (!config.headers) {
-            config.headers = {};
-        }
-        // Set access token
-        config.headers['Authorization'] = `Bearer ${this.token_set.access_token}`;
-        // Determine request method
-        config.method = config.method ?? 'GET';
         // Make request
-        const response = await this.axios.request(config).catch(error => {
-            // TODO: Some custom error handling?
-            if (error.response.data && error.response.data.$errors && error.response.data.$errors.length > 0) {
-                const $errors = error.response.data.$errors;
-                if (this.edlink.log_level === 'debug') {
-                    for (const _error of $errors) {
-                        console.warn(`Edlink API Error: ${_error.code} ${_error.message}`);
-                    }
-                    if ($errors.some((it: EdlinkError) => it.code === 'INVALID_TOKEN')) {
-                        console.warn('Edlink SDK Warning: Missing person refresh token - if you recieved a 401 error this may be the cause.');
-                    }
-                }
-                throw new EdlinkError({
-                    ...$errors[0],
-                    status: error.response.status,
-                    errors: $errors.slice(1)
-                });
-            }
-            throw error;
-        });
-        if (response.data.$warnings) {
+        const response = await fetch(req);
+        const data = await response.json();
+
+        if (data.$warnings) {
             if (this.edlink.log_level === 'debug') {
-                for (const warning of response.data.$warnings) {
+                for (const warning of data.$warnings) {
                     console.warn(`Edlink API Warning: ${warning.code} ${warning.message}`);
                 }
             }
         }
-        return raw ? response.data : response.data.$data;
+
+        if (data.$errors) {
+            if (this.edlink.log_level === 'debug') {
+                for (const error of data.$errors) {
+                    console.warn(`Edlink API Error: ${error.code} ${error.message}`);
+                }
+            }
+            throw new EdlinkError({
+                ...data.$errors[0],
+                status: response.status,
+                errors: data.$errors.slice(1)
+            });
+        }
+        
+        return raw ? data : data.$data;
     }
 
     async *paginate<T>(
-        endpoint: string,
+        config: string | RequestConfig,
         options: Record<string, any> = {},
-        config: Record<string, any> = {},
         until?: (item: T) => boolean,
         formatter?: (raw: any) => T
     ): AsyncGenerator<T> {
@@ -112,8 +147,15 @@ export class BearerTokenAPI {
         let remaining = options.limit;
 
         do {
+            if (next) {
+                if (typeof config === 'string') {
+                    config = next;
+                } else {
+                    config.url = next;
+                }
+            }
+
             const response: { $data: T[]; $next?: string } = await this.request(
-                next ?? endpoint,
                 config,
                 options,
                 true

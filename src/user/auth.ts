@@ -1,13 +1,10 @@
-import axios, { AxiosStatic } from 'axios';
 import { EdlinkConfig } from '..';
 import { PersonTokenSet, TokenSetType } from '../types';
 
 export class Auth {
-    private api: AxiosStatic;
     private config: EdlinkConfig;
 
     constructor(config: EdlinkConfig) {
-        this.api = axios;
         this.config = config;
     }
 
@@ -19,14 +16,24 @@ export class Auth {
             redirect_uri: redirect_uri,
             grant_type: 'authorization_code'
         };
-        return this.api
-            .request({ url: 'https://ed.link/api/authentication/token', data, method: 'POST' })
-            .then(response => {
-                return {
-                    ...response.data.$data,
-                    type: TokenSetType.Person
-                };
-            });
+
+        const response = await fetch('https://ed.link/api/authentication/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return {
+                ...data,
+                type: TokenSetType.Person
+            }
+        } else {
+            throw new Error('Failed exchange code for OAuth token');
+        }
     }
 
     async refresh(refresh_token: string): Promise<PersonTokenSet> {
@@ -36,13 +43,25 @@ export class Auth {
             client_secret: this.config.client_secret,
             grant_type: 'refresh_token'
         };
-        return this.api
-            .request({ url: 'https://ed.link/api/authentication/token', data, method: 'POST' })
-            .then(response => {
-                return {
-                    ...response.data.$data,
-                    type: TokenSetType.Person
-                };
-            });
+
+        const response = await fetch('https://ed.link/api/authentication/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+            const res = await response.json();
+            const data = res.$data;
+
+            return {
+                ...data,
+                type: TokenSetType.Person
+            }
+        } else {
+            throw new Error('Failed to refresh token');
+        }
     }
 }

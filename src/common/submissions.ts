@@ -33,7 +33,6 @@ export class Submissions {
     ): Promise<Submission> {
         return this.api.request(
             `/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}`,
-            {},
             options
         );
     }
@@ -47,7 +46,8 @@ export class Submissions {
      * @returns The updated submission
      */
     public async submit(class_id: string, assignment_id: string, attempt: Partial<Attempt>, options: RequestOptionsPost = {}): Promise<Submission> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/submit`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments/${assignment_id}/submit`,
             method: 'POST',
             data: attempt
         }, options);
@@ -60,7 +60,8 @@ export class Submissions {
      * @returns The reclaimed submission
      */
     public async reclaim(class_id: string, assignment_id: string, options: RequestOptionsPost = {}): Promise<Submission> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/reclaim`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments/${assignment_id}/reclaim`,
             method: 'POST'
         }, options);
     }
@@ -73,7 +74,8 @@ export class Submissions {
      * @returns The returned submission
      */
     public async return(class_id: string, assignment_id: string, submission_id: string, options: RequestOptionsPost = {}): Promise<Submission> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}/return`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}/return`,
             method: 'POST'
         }, options);
     }
@@ -94,7 +96,8 @@ export class Submissions {
         submission: Partial<Submission>,
         options: RequestOptionsBase = {}
     ): Promise<Submission> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments/${assignment_id}/submissions/${submission_id}`,
             method: 'PATCH',
             data: submission
         }, options);

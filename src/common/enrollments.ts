@@ -18,6 +18,6 @@ export class Enrollments {
      * @throws `404` If the enrollment does not exist
      */
     fetch(enrollment_id: string, options: RequestOptionsGet = {}): Promise<Enrollment> {
-        return this.api.request(`/enrollments/${enrollment_id}`, {}, options);
+        return this.api.request(`/enrollments/${enrollment_id}`, options);
     }
 }

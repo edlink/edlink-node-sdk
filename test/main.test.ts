@@ -388,7 +388,7 @@ describe('Graph', () => {
             .use(token_set)
             .classes.fetch('fc8ba5f4-1b10-42a8-9929-75790d601912', { expand: ['products'] });
         expect(_class.products).toBeDefined();
-        expect(_class.products).toBeInstanceOf(Array);
+        expect(Array.isArray(_class.products)).toBe(true);
         expect(_class.products!.length).toBeGreaterThan(0);
     });
 
@@ -397,7 +397,7 @@ describe('Graph', () => {
             .use(token_set)
             .people.fetch('f7ba3e9d-b1f1-451a-802b-f072a3482c55', { expand: ['products'] });
         expect(person).toBeDefined();
-        expect(person.products).toBeInstanceOf(Array);
+        expect(Array.isArray(person.products)).toBe(true);
         expect(person.products!.length).toBeGreaterThan(0);
     });
 });
