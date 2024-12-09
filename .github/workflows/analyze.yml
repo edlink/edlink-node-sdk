@@ -29,7 +29,8 @@ jobs:
 
       - name: Install deps and build (with cache)
         run: yarn
-        
+        run: yarn build
+
       - name: Test
         run: yarn test --ci --coverage --maxWorkers=2
         env:
