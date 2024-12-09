@@ -17,7 +17,7 @@ export class Schools {
      * @returns The requested school
      */
     fetch(school_id: string, options: RequestOptionsGet = {}): Promise<School> {
-        return this.api.request(`/schools/${school_id}`, {}, options);
+        return this.api.request(`/schools/${school_id}`, options);
     }
 
     /**

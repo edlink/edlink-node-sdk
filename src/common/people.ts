@@ -19,7 +19,7 @@ export class People {
      * @throws `404` If the person does not exist
      */
     fetch(person_id: string, options: RequestOptionsGet = {}): Promise<Person> {
-        return this.api.request(`/people/${person_id}`, {}, options);
+        return this.api.request(`/people/${person_id}`, options);
     }
 
     /**

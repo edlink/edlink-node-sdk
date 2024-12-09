@@ -20,7 +20,7 @@ export class Categories {
      * @throws 404 if the category does not exist
      */
     public async fetch(class_id: string, category_id: string, options: RequestOptionsGet = {}): Promise<Category> {
-        return this.api.request(`/classes/${class_id}/categories/${category_id}`, {}, options);
+        return this.api.request(`/classes/${class_id}/categories/${category_id}`, options);
     }
 
     /**
@@ -30,7 +30,8 @@ export class Categories {
      * @returns The created category
      */
     public async create(class_id: string, category: Category, options: RequestOptionsPost = {}): Promise<Category> {
-        return this.api.request(`/classes/${class_id}/categories`, {
+        return this.api.request({
+            url: `/classes/${class_id}/categories`,
             method: 'POST',
             data: category
         }, options);
@@ -45,7 +46,8 @@ export class Categories {
      * @throws `400` if the category is invalid
      */
     public async update(class_id: string, category_id: string, category: Partial<Category>, options: RequestOptionsBase = {}): Promise<Category> {
-        return this.api.request(`/classes/${class_id}/categories/${category_id}`, {
+        return this.api.request({
+            url: `/classes/${class_id}/categories/${category_id}`,
             method: 'PATCH',
             data: category
         }, options);
@@ -59,7 +61,8 @@ export class Categories {
      * @throws `404` if the category does not exist
      */
     public async delete(class_id: string, category_id: string, options: RequestOptionsBase = {}): Promise<void> {
-        return this.api.request(`/classes/${class_id}/categories/${category_id}`, {
+        return this.api.request({
+            url: `/classes/${class_id}/categories/${category_id}`,
             method: 'DELETE'
         }, options);
     }

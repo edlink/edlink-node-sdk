@@ -20,7 +20,7 @@ export class Assignments {
      * @throws `404` if the assignment does not exist
      */
     public async fetch(class_id: string, assignment_id: string, options: RequestOptionsGet = {}): Promise<Assignment> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {}, options);
+        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, options);
     }
 
     /**
@@ -31,7 +31,8 @@ export class Assignments {
      * @throws `400` if the assignment is invalid
      */
     public async create(class_id: string, assignment: Partial<Assignment>, options: RequestOptionsPost = {}): Promise<Assignment> {
-        return this.api.request(`/classes/${class_id}/assignments`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments`,
             method: 'POST',
             data: assignment
         }, options);
@@ -46,7 +47,8 @@ export class Assignments {
      * @throws `400` if the assignment is invalid
      */
     public async update(class_id: string, assignment_id: string, assignment: Partial<Assignment>, options: RequestOptionsBase = {}): Promise<Assignment> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments/${assignment_id}`,
             method: 'PATCH',
             data: assignment
         }, options);
@@ -60,7 +62,8 @@ export class Assignments {
      * @throws `404` if the assignment does not exist
      */
     public async delete(class_id: string, assignment_id: string, options: RequestOptionsBase = {}): Promise<void> {
-        return this.api.request(`/classes/${class_id}/assignments/${assignment_id}`, {
+        return this.api.request({
+            url: `/classes/${class_id}/assignments/${assignment_id}`,
             method: 'DELETE'
         }, options);
     }

@@ -18,7 +18,7 @@ export class Sections {
      * @returns
      */
     fetch(section_id: string, options: RequestOptionsGet = {}): Promise<Section> {
-        return this.api.request(`/sections/${section_id}`, {}, options);
+        return this.api.request(`/sections/${section_id}`, options);
     }
 
     /**

@@ -17,7 +17,7 @@ export class Classes {
      * @returns The requested class
      */
     fetch(class_id: string, options: RequestOptionsGet = {}): Promise<Class> {
-        return this.api.request(`/classes/${class_id}`, {}, options);
+        return this.api.request(`/classes/${class_id}`, options);
     }
 
     /**

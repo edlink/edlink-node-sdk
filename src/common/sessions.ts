@@ -18,6 +18,6 @@ export class Sessions {
      * @returns The requested session
      */
     fetch(session_id: string, options: RequestOptionsGet = {}): Promise<Session> {
-        return this.api.request(`/sessions/${session_id}`, {}, options);
+        return this.api.request(`/sessions/${session_id}`, options);
     }
 }
