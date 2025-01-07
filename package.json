@@ -12,7 +12,9 @@
     "node": ">=10"
   },
   "scripts": {
-    "build": "esbuild src/index.ts --bundle --format=cjs --target=esnext --platform=node --outfile=dist/index.js --sourcemap",
+    "build:core": "esbuild src/index.ts --bundle --format=cjs --target=esnext --platform=node --outfile=dist/index.js --sourcemap",
+    "build:types": "tsc --declaration --emitDeclarationOnly --project tsconfig.json --outDir dist",
+    "build": "npm run build:core && npm run build:types",
     "test": "jest"
   },
   "husky": {},
@@ -24,7 +26,6 @@
   },
   "name": "@edlink/typescript",
   "author": "Jaron",
-  "module": "dist/edlink.esm.js",
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "dotenv": "^16.0.2",
