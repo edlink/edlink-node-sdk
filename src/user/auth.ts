@@ -26,7 +26,12 @@ export class Auth {
         });
 
         if (response.ok) {
-            const data = await response.json();
+            let data = await response.json();
+            
+            if ('$data' in data) {
+                data = data.$data;
+            }
+            
             return {
                 ...data,
                 type: TokenSetType.Person
@@ -53,8 +58,11 @@ export class Auth {
         });
 
         if (response.ok) {
-            const res = await response.json();
-            const data = res.$data;
+            let data = await response.json();
+            
+            if ('$data' in data) {
+                data = data.$data;
+            }
 
             return {
                 ...data,
