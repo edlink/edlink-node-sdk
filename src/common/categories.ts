@@ -29,7 +29,7 @@ export class Categories {
      * @param category The category to create
      * @returns The created category
      */
-    public async create(class_id: string, category: Category, options: RequestOptionsPost = {}): Promise<Category> {
+    public async create(class_id: string, category: Partial<Category>, options: RequestOptionsPost = {}): Promise<Category> {
         return this.api.request({
             url: `/classes/${class_id}/categories`,
             method: 'POST',

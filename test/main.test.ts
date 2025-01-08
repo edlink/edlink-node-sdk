@@ -400,6 +400,9 @@ describe('Graph', () => {
         expect(Array.isArray(person.products)).toBe(true);
         expect(person.products!.length).toBeGreaterThan(0);
     });
+
+    // Categories
+    
 });
 
 describe('Request Options', () => {
@@ -436,6 +439,71 @@ describe('Request Options', () => {
             // Check that the second assignment is the same as the first
             expect(assignment2).toBeDefined();
             expect(assignment2).toStrictEqual(assignment);
+        }
+    });
+});
+
+describe('Categories', () => {
+    it('should list categories for a class', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+            for await (const category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
+                expect(category).toBeDefined();
+            }
+        }
+    });
+
+    it('should fetch a specific category for a class', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+            for await (const _category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
+                const category = await edlink.use(refresh).categories.fetch(_class.id, _category.id);
+                expect(category).toBeDefined();
+                expect(category).toStrictEqual(_category);
+            }
+        }
+    });
+
+    it('should create a new category for a class', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+            const newCategory = {
+                title: 'Test Category',
+            };
+            const category = await edlink.use(refresh).categories.create(_class.id, newCategory);
+            expect(category).toBeDefined();
+            expect(category.title).toBe(newCategory.title);
+        }
+    });
+
+    it('should update a category for a class', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+            for await (const _category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
+                const updatedCategory = {
+                    title: 'Updated Test Category',
+                };
+                const category = await edlink.use(refresh).categories.update(_class.id, _category.id, updatedCategory);
+                expect(category).toBeDefined();
+                expect(category.title).toBe(updatedCategory.title);
+            }
+        }
+    });
+    
+    it('should create and delete a category', async () => {
+        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+            // Create a new category
+            const newCategory = {
+                title: 'Category to Delete',
+            };
+            const category = await edlink.use(refresh).categories.create(_class.id, newCategory);
+            expect(category).toBeDefined();
+            expect(category.title).toBe(newCategory.title);
+
+            // Delete the created category
+            const response = await edlink.use(refresh).categories.delete(_class.id, category.id);
+            expect(response).toBeDefined();
         }
     });
 });
