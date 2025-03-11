@@ -38,7 +38,7 @@ import { Attachment } from ".";
      * @type {SubmissionState}
      * @memberof Submission
      */
-     state: SubmissionState;
+    state: SubmissionState;
     /**
      * 
      * The flags for the submission. All, some, or none of the possible flags may be included.
