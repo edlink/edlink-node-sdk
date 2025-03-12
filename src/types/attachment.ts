@@ -55,7 +55,9 @@ export interface Attachment {
  * @enum {string}
  */
 export enum AttachmentType {
-    Link = 'link',
     Text = 'text',
-    File = 'file'
+    Link = 'link',
+    File = 'file',
+    Drive = 'drive',
+    LTI = 'lti'
 }
