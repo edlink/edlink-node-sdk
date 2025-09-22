@@ -1,6 +1,8 @@
 name: CI Testing
 on:
     pull_request:
+        types:
+            - opened
         secrets:
             CLIENT_SECRET:
                 required: true
