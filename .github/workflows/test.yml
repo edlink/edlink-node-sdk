@@ -1,0 +1,31 @@
+name: CI Testing
+on:
+    pull_request:
+        secrets:
+            CLIENT_SECRET:
+                required: true
+            INTEGRATION_ACCESS_TOKEN:
+                required: true
+            REFRESH_TOKEN:
+                required: true
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        name: Build and test
+
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v4
+
+            - name: Install deps and build (with cache)
+              run: yarn && yarn build
+
+            - name: Test
+              run: yarn test --ci --coverage --maxWorkers=2
+              env:
+                  CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+                  INTEGRATION_ACCESS_TOKEN: ${{ secrets.INTEGRATION_ACCESS_TOKEN }}
+                  REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
+
+            - name: Build
+              run: yarn build
