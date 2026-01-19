@@ -190,9 +190,28 @@ export type IntegrationTokenSet = BaseTokenSet & {
 
 export type TokenSet = PersonTokenSet | IntegrationTokenSet;
 
+type RequestOptionsFilterWithValue = {
+  operator:
+    | 'equals'
+    | 'starts with'
+    | 'contains'
+    | 'in'
+    | 'not in'
+    | 'gt'
+    | 'gte'
+    | 'lt'
+    | 'lte';
+  value: string;
+};
+type RequestOptionsFilterWithoutValue = {
+  operator: 'is known' | 'is unknown';
+};
+export type RequestOptionsFilter =
+  | FilterWithValue
+  | FilterWithoutValue;
 export type RequestOptionsPaging = {
     limit?: number;
-    filter?: Record<string, any>;
+    filter?: Record<string, RequestOptionsFilter[]>;
 } & RequestOptionsGet;
 
 export type RequestOptionsGet = {
