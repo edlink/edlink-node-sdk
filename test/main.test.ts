@@ -30,8 +30,6 @@ const edlink = new Edlink({
     log_level: 'silent'
 });
 
-// jest.setTimeout(10000);
-``
 describe('User', () => {
     it('auth', async () => {
         // const grant = await edlink.auth.grant({
@@ -443,6 +441,7 @@ describe('Request Options', () => {
     });
 });
 
+if (process.env.REFRESH_TOKEN) {
 describe('Categories', () => {
     it('should list categories for a class', async () => {
         const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
@@ -507,3 +506,6 @@ describe('Categories', () => {
         }
     });
 });
+} else {
+    console.error('REFRESH_TOKEN is not set, skipping tests that require it');
+}
