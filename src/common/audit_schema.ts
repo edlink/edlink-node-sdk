@@ -5,7 +5,6 @@ import {
   CRUDXType,
   RequestOptionsBase,
   RequestOptionsGet,
-  RequestOptionsPaging,
   RequestOptionsPost,
 } from "../types";
 

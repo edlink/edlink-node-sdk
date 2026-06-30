@@ -11,6 +11,8 @@ import {
     Person,
     TokenSetType,
     IntegrationTokenSet,
+    ApplicationTokenSet,
+    ScopeType,
     Agent,
     PersonTokenSet,
 } from '../src';
@@ -440,6 +442,81 @@ describe('Request Options', () => {
         }
     });
 });
+
+if (process.env.APPLICATION_SECRET_KEY) {
+    const application_token_set: ApplicationTokenSet = {
+        access_token: process.env.APPLICATION_SECRET_KEY!,
+        type: TokenSetType.Application
+    };
+
+    describe('Audit', () => {
+        let created_event_id: string;
+
+        it('POST /api/v2/audit/events', async () => {
+            const result = await edlink.use(application_token_set).events.create({
+                actor: {
+                    type: 'person',
+                    identifiers: [{ value: 'test_user_1', issuer: 'test' }]
+                },
+                action: 'user.login',
+                targets: [
+                    { type: 'session', identifiers: [{ value: 'session_abc', issuer: 'test' }] }
+                ],
+                scope: {
+                    id: process.env.AUDIT_SCOPE_ID! as `${string}-${string}-${string}-${string}-${string}`,
+                    type: ScopeType.Integration
+                },
+                context: {
+                    http_method: 'POST',
+                    path: '/login',
+                    ip: '1.2.3.4',
+                    user_agent: 'Jest'
+                },
+                data: {
+                    internal_user_id: 'test_user_1',
+                    application_name: 'Test Suite'
+                }
+            });
+            expect(result).toBeDefined();
+            expect(result.id).toBeDefined();
+            created_event_id = result.id!;
+        });
+
+        it('GET /api/v2/audit/events/:event_id', async () => {
+            const event = await edlink.use(application_token_set).events.fetch(created_event_id);
+            expect(event).toBeDefined();
+            expect(event.id).toBe(created_event_id);
+            expect(event.action).toBe('user.login');
+            expect(event.actor).toBeDefined();
+            expect(event.actor.type).toBe('person');
+            expect(event.targets).toBeDefined();
+            expect(Array.isArray(event.targets)).toBe(true);
+            expect(event.scope).toBeDefined();
+            expect(event.created_date).toBeDefined();
+        });
+
+        it('GET /api/v2/audit/events/:scope_type/:scope_id', async () => {
+            let found = false;
+            for await (const event of edlink.use(application_token_set).events.list('integration', process.env.AUDIT_SCOPE_ID!, { limit: 25 })) {
+                expect(event).toBeDefined();
+                expect(event.id).toBeDefined();
+                expect(event.action).toBeDefined();
+                if (event.id === created_event_id) {
+                    found = true;
+                }
+            }
+            expect(found).toBe(true);
+        });
+
+        it('GET /api/v2/audit/events/:scope_type/:scope_id with action filter', async () => {
+            for await (const event of edlink.use(application_token_set).events.list('integration', process.env.AUDIT_SCOPE_ID!, { limit: 5, filter: { action: 'user.login' } })) {
+                expect(event.action).toBe('user.login');
+            }
+        });
+    });
+} else {
+    console.error('APPLICATION_SECRET_KEY is not set, skipping Audit tests');
+}
 
 if (process.env.REFRESH_TOKEN) {
 describe('Categories', () => {
