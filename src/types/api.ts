@@ -26,14 +26,19 @@ class EdlinkError extends Error {
 export class BearerTokenAPI {
     private token_set: TokenSet;
     private version: number;
-    private api: 'graph' | 'my';
+    public api: 'graph' | 'my' | 'audit';
     public edlink: Edlink;
 
     constructor(edlink: Edlink, token_set: TokenSet) {
         // Assign config
         this.token_set = token_set;
         this.version = edlink.version;
-        this.api = token_set.type === TokenSetType.Integration ? 'graph' : 'my';
+        this.api = 'graph';// default for TokenSetType.Integration
+        if (token_set.type === TokenSetType.Application) {
+          this.api = 'audit';
+        } else if (token_set.type === TokenSetType.Person) {
+          this.api = 'my';
+        }
         this.edlink = edlink;
     }
 
