@@ -188,7 +188,15 @@ export type IntegrationTokenSet = BaseTokenSet & {
     access_token: string;
 };
 
-export type TokenSet = PersonTokenSet | IntegrationTokenSet;
+export type ApplicationTokenSet = BaseTokenSet & {
+  type: TokenSetType.Application;
+  access_token: string;
+};
+
+export type TokenSet =
+  | PersonTokenSet
+  | IntegrationTokenSet
+  | ApplicationTokenSet;
 
 export type RequestOptionsPaging = {
     limit?: number;
