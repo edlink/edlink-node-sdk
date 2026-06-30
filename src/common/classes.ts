@@ -7,7 +7,7 @@ export class Classes {
      * Paginates through all classes that the user has access to.
      * @param options Provide a `limit` for the max number of results
      */
-    async *list(options: { limit?: number } = {}): AsyncGenerator<Class> {
+    async *list(options: RequestOptionsPaging = {}): AsyncGenerator<Class> {
         yield* this.api.paginate<Class>('/classes', options);
     }
 
