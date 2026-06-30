@@ -181,7 +181,7 @@ export class BearerTokenAPI {
     }
 
     private requiresTokenRefresh(tokens: TokenSet = this.token_set): boolean {
-        if (tokens.type === TokenSetType.Integration) {
+        if (tokens.type === TokenSetType.Integration || tokens.type === TokenSetType.Application) {
             return false;
         }
 
