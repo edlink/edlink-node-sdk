@@ -480,6 +480,7 @@ if (process.env.APPLICATION_SECRET_KEY) {
             expect(result).toBeDefined();
             expect(result.id).toBeDefined();
             created_event_id = result.id!;
+            await new Promise((r) => setTimeout(r, 3000)); // must wait for async_inserts to clickhouse to work
         });
 
         it('GET /api/v2/audit/events/:event_id', async () => {
@@ -509,7 +510,7 @@ if (process.env.APPLICATION_SECRET_KEY) {
         });
 
         it('GET /api/v2/audit/events/:scope_type/:scope_id with action filter', async () => {
-            for await (const event of edlink.use(application_token_set).events.list('integration', process.env.AUDIT_SCOPE_ID!, { limit: 5, filter: { action: 'user.login' } })) {
+            for await (const event of edlink.use(application_token_set).events.list('integration', process.env.AUDIT_SCOPE_ID!, { limit: 5, filter: { action: [{operator: 'equals', value: 'user.login' }]} })) {
                 expect(event.action).toBe('user.login');
             }
         });
