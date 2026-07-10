@@ -1,5 +1,4 @@
 export { AuditEvents } from './audit_event';
-export { AuditSchemas } from './audit_schema';
 export { Agents } from './agents';
 export { Classes } from './classes';
 export { Courses } from './courses';

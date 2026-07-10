@@ -1,4 +1,14 @@
-import { CRUDXType } from ".";
+/**
+ * @export
+ * @enum {string}
+ */
+export enum CRUDXType {
+  Create = "create",
+  Read = "read",
+  Update = "update",
+  Delete = "delete",
+  Other = "other",
+}
 type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export enum ScopeType {
