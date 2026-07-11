@@ -76,3 +76,5 @@ apps/dashboard/common_types.tsbuildinfo
 *.log
 junit.xml
 .env.test.github-action
+
+*.swp

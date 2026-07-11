@@ -1,3 +1,4 @@
+export { AuditEvents } from './audit_event';
 export { Agents } from './agents';
 export { Classes } from './classes';
 export { Courses } from './courses';

@@ -3,6 +3,8 @@ import { Edlink } from '..';
 import { deepDefaults } from '../utils';
 import { RequestOptions, TokenSet, TokenSetType } from './common';
 
+const EDLINK_URL = process.env.ALTERNATE_EDLINK_URL ?? 'https://ed.link';
+
 export type RequestConfig = {
     url: string;
     method: string;
@@ -26,14 +28,19 @@ class EdlinkError extends Error {
 export class BearerTokenAPI {
     private token_set: TokenSet;
     private version: number;
-    private api: 'graph' | 'my';
+    public api: 'graph' | 'my' | 'audit';
     public edlink: Edlink;
 
     constructor(edlink: Edlink, token_set: TokenSet) {
         // Assign config
         this.token_set = token_set;
         this.version = edlink.version;
-        this.api = token_set.type === TokenSetType.Integration ? 'graph' : 'my';
+        this.api = 'graph';// default for TokenSetType.Integration
+        if (token_set.type === TokenSetType.Application) {
+          this.api = 'audit';
+        } else if (token_set.type === TokenSetType.Person) {
+          this.api = 'my';
+        }
         this.edlink = edlink;
     }
 
@@ -63,7 +70,7 @@ export class BearerTokenAPI {
         // Set url
         const formattedUrl = new URL(url.startsWith('http')
         ? url
-        : `https://ed.link/api/v${this.version}/${this.api}${url}`);
+        : `${EDLINK_URL}/api/v${this.version}/${this.api}${url}`);
 
         // Add formatted options to the URL
         for (const [key, value] of Object.entries(formatted_options)) {
@@ -176,7 +183,7 @@ export class BearerTokenAPI {
     }
 
     private requiresTokenRefresh(tokens: TokenSet = this.token_set): boolean {
-        if (tokens.type === TokenSetType.Integration) {
+        if (tokens.type === TokenSetType.Integration || tokens.type === TokenSetType.Application) {
             return false;
         }
 

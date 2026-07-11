@@ -1,6 +1,7 @@
 import { serialize } from './common';
+import { Audit } from './audit';
 import { Graph } from './graph';
-import { IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
+import { ApplicationTokenSet, IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
 import { User } from './user';
 import { Auth } from './user/auth';
 
@@ -44,10 +45,18 @@ export class Edlink {
      * @returns {User} An instance of the Edlink User API interface using the provided TokenSet
      */
     public use(token_set: PersonTokenSet): User;
+    /**
+     * Initialize an instance of the Edlink Audit API with an application token set.
+     * @param token_set The ApplicationTokenSet used to authenticate the request
+     * @returns {Audit} An instance of the Edlink Audit API interface using the provided TokenSet
+     */
+    public use(token_set: ApplicationTokenSet): Audit;
 
-    public use(token_set: PersonTokenSet | IntegrationTokenSet): User | Graph {
+    public use(token_set: PersonTokenSet | IntegrationTokenSet | ApplicationTokenSet): User | Graph | Audit {
         if (token_set.type === TokenSetType.Person) {
             return new User(this, token_set);
+        } else if (token_set.type === TokenSetType.Application) {
+            return new Audit(this, token_set);
         } else {
             return new Graph(this, token_set);
         }
