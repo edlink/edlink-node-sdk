@@ -9,16 +9,12 @@ export enum CRUDXType {
   Delete = "delete",
   Other = "other",
 }
-type UUID = `${string}-${string}-${string}-${string}-${string}`;
-
-export enum ScopeType {
-    Institution = "institution",
-    Integration = "integration",
-}
+export type UUID = `${string}-${string}-${string}-${string}-${string}`;
 
 export interface AuditIdentifier {
     value: string;
     issuer: string;
+    name?: string;
 }
 
 export interface Actor {
@@ -31,11 +27,6 @@ export interface Target {
     type: string;
     identifiers: AuditIdentifier[];
     details?: object;
-}
-
-export interface Scope {
-    id: UUID;
-    type: ScopeType;
 }
 
 export interface SchemaRef {
@@ -106,11 +97,18 @@ export interface AuditEvent {
      */
     targets: Target[];
     /**
-     * The scope (integration or institution) the Event belongs to.
-     * @type {Scope}
+     * The user-defined scope the Event belongs to.
+     * An arbitrary string identifier (up to 128 bytes) internal to your system.
+     * @type {string}
      * @memberof AuditEvent
      */
-    scope: Scope;
+    scope: string;
+    /**
+     * The Edlink Public-Data API 'institution' the Event belongs to.
+     * @type {UUID}
+     * @memberof AuditEvent
+     */
+    institution?: UUID;
     /**
      * Information about the underlying network request. Strongly suggested.
      * @type {Context}

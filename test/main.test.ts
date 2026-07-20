@@ -12,8 +12,6 @@ import {
     TokenSetType,
     IntegrationTokenSet,
     ApplicationTokenSet,
-    ScopeType,
-    CRUDXType,
     Agent,
     PersonTokenSet,
 } from '../src';
@@ -452,9 +450,6 @@ if (process.env.APPLICATION_SECRET_KEY) {
 
     describe('Audit', () => {
         let created_event_id: string;
-        let created_schema_id: string;
-        let created_schema_action: string;
-        let created_schema_event_id: string;
 
         it('POST /api/v2/audit/events', async () => {
             const result = await edlink.use(application_token_set).events.create({
@@ -464,12 +459,9 @@ if (process.env.APPLICATION_SECRET_KEY) {
                 },
                 action: 'user.login',
                 targets: [
-                    { type: 'session', identifiers: [{ value: 'session_abc', issuer: 'test' }] }
+                    { type: 'session', identifiers: [{ value: 'session_abc', issuer: 'test', name: 'Test Session' }] }
                 ],
-                scope: {
-                    id: process.env.AUDIT_SCOPE_ID! as `${string}-${string}-${string}-${string}-${string}`,
-                    type: ScopeType.Integration
-                },
+                scope: process.env.AUDIT_SCOPE_ID!,
                 context: {
                     http_method: 'POST',
                     path: '/login',
@@ -500,9 +492,9 @@ if (process.env.APPLICATION_SECRET_KEY) {
             expect(event.created_date).toBeDefined();
         });
 
-        it('GET /api/v2/audit/events/:scope_type/:scope_id', async () => {
+        it('GET /api/v2/audit/events/scope/:scope_id', async () => {
             let found = false;
-            for await (const event of edlink.use(application_token_set).events.list('integration', process.env.AUDIT_SCOPE_ID!, { limit: 25 })) {
+            for await (const event of edlink.use(application_token_set).events.list(process.env.AUDIT_SCOPE_ID!, { limit: 25 })) {
                 expect(event).toBeDefined();
                 expect(event.id).toBeDefined();
                 expect(event.action).toBeDefined();
@@ -513,99 +505,8 @@ if (process.env.APPLICATION_SECRET_KEY) {
             expect(found).toBe(true);
         });
 
-        it('POST /api/v2/audit/schemas', async () => {
-            created_schema_action = `test.schema.${Date.now()}`;
-            const schema = await edlink.use(application_token_set).schemas.create(
-                { id: created_schema_action, type: CRUDXType.Create },
-                {
-                    type: 'object',
-                    properties: {
-                        test_field: { type: 'string', description: 'A test field' }
-                    },
-                    required: ['test_field']
-                },
-                'lax'
-            );
-            expect(schema).toBeDefined();
-            expect(schema.id).toBeDefined();
-            expect(schema.action.id).toBe(created_schema_action);
-            expect(schema.action.type).toBe(CRUDXType.Create);
-            expect(schema.validation_level).toBe('lax');
-            created_schema_id = schema.id;
-        });
-
-        it('GET /api/v2/audit/schemas/:schema_id_or_action (by id)', async () => {
-            const schema = await edlink.use(application_token_set).schemas.fetch(created_schema_id);
-            expect(schema).toBeDefined();
-            expect(schema.id).toBe(created_schema_id);
-            expect(schema.action.id).toBe(created_schema_action);
-            expect(schema.action.type).toBe(CRUDXType.Create);
-            expect(schema.validation_level).toBe('lax');
-        });
-
-        it('GET /api/v2/audit/schemas/:schema_id_or_action (by action)', async () => {
-            const schema = await edlink.use(application_token_set).schemas.fetch(created_schema_action);
-            expect(schema).toBeDefined();
-            expect(schema.id).toBe(created_schema_id);
-            expect(schema.action.id).toBe(created_schema_action);
-        });
-
-        it('PATCH /api/v2/audit/schemas', async () => {
-            const schema = await edlink.use(application_token_set).schemas.update(
-                created_schema_action,
-                {
-                    action_type: CRUDXType.Other,
-                    validation_level: 'strict',
-                    data: {
-                        type: 'object',
-                        properties: {
-                            test_field: { type: 'string', description: 'A test field' },
-                            extra_field: { type: 'number', description: 'An extra field' }
-                        },
-                        required: ['test_field']
-                    }
-                }
-            );
-            expect(schema).toBeDefined();
-            expect(schema.id).toBe(created_schema_id);
-            expect(schema.action.id).toBe(created_schema_action);
-            expect(schema.action.type).toBe(CRUDXType.Other);
-            expect(schema.validation_level).toBe('strict');
-        });
-
-        it('POST /api/v2/audit/events (with schema)', async () => {
-            const result = await edlink.use(application_token_set).events.create({
-                actor: {
-                    type: 'system',
-                    identifiers: [{ value: 'test_system_1', issuer: 'test' }]
-                },
-                action: created_schema_action,
-                targets: [
-                    { type: 'resource', identifiers: [{ value: 'resource_xyz', issuer: 'test' }] }
-                ],
-                scope: {
-                    id: process.env.AUDIT_SCOPE_ID! as `${string}-${string}-${string}-${string}-${string}`,
-                    type: ScopeType.Integration
-                },
-                data: { test_field: 'hello from schema test' }
-            });
-            expect(result).toBeDefined();
-            expect(result.id).toBeDefined();
-            created_schema_event_id = result.id!;
-            await new Promise((r) => setTimeout(r, 3000));
-        });
-
-        it('GET /api/v2/audit/events/:event_id (schema id present)', async () => {
-            const event = await edlink.use(application_token_set).events.fetch(created_schema_event_id);
-            expect(event).toBeDefined();
-            expect(event.id).toBe(created_schema_event_id);
-            expect(event.action).toBe(created_schema_action);
-            expect(event.schema).toBeDefined();
-            expect(event.schema?.id).toBe(created_schema_id);
-        });
-
-        it('GET /api/v2/audit/events/:scope_type/:scope_id with action filter', async () => {
-            for await (const event of edlink.use(application_token_set).events.list('integration', process.env.AUDIT_SCOPE_ID!, { limit: 5, filter: { action: [{operator: 'equals', value: 'user.login' }]} })) {
+        it('GET /api/v2/audit/events/scope/:scope_id with action filter', async () => {
+            for await (const event of edlink.use(application_token_set).events.list(process.env.AUDIT_SCOPE_ID!, { limit: 5, filter: { action: [{operator: 'equals', value: 'user.login' }]} })) {
                 expect(event.action).toBe('user.login');
             }
         });
