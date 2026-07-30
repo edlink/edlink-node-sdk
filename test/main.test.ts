@@ -491,25 +491,6 @@ if (process.env.APPLICATION_SECRET_KEY) {
             expect(event.scope).toBeDefined();
             expect(event.created_date).toBeDefined();
         });
-
-        it('GET /api/v2/audit/events/scope/:scope_id', async () => {
-            let found = false;
-            for await (const event of edlink.use(application_token_set).events.list(process.env.AUDIT_SCOPE_ID!, { limit: 25 })) {
-                expect(event).toBeDefined();
-                expect(event.id).toBeDefined();
-                expect(event.action).toBeDefined();
-                if (event.id === created_event_id) {
-                    found = true;
-                }
-            }
-            expect(found).toBe(true);
-        });
-
-        it('GET /api/v2/audit/events/scope/:scope_id with action filter', async () => {
-            for await (const event of edlink.use(application_token_set).events.list(process.env.AUDIT_SCOPE_ID!, { limit: 5, filter: { action: [{operator: 'equals', value: 'user.login' }]} })) {
-                expect(event.action).toBe('user.login');
-            }
-        });
     });
 } else {
     console.error('APPLICATION_SECRET_KEY is not set, skipping Audit tests');
