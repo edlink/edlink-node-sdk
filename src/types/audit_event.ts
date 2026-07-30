@@ -18,7 +18,7 @@ export interface AuditIdentifier {
 }
 
 export interface Actor {
-    type: "person" | "system" | "external";
+    type: "person" | "system" | "anonymous";
     identifiers: AuditIdentifier[];
     details?: object;
 }
@@ -45,7 +45,7 @@ export interface Context {
     hostname?: string;
     os?: string;
     environment?: string;
-    trigger?: "person" | "system" | "external";
+    trigger?: "person" | "system" | "anonymous";
     deployment_id?: string;
 }
 
