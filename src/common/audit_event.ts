@@ -8,15 +8,6 @@ export class AuditEvents {
     }
 
     /**
-     * Paginates through all Events within a given scope.
-     * @param scope_id An arbitrary string identifier for the scope (e.g. a tenant or customer ID)
-     * @param options Provide a `limit` for the max number of results
-     */
-    async *list(scope_id: string, options: RequestOptionsPaging = {}): AsyncGenerator<AuditEvent> {
-        yield* this.api.paginate<AuditEvent>(`/events/scope/${scope_id}`, options);
-    }
-
-    /**
      * Fetches a single Event by ID.
      * @param event_id The UUID of the Event
      * @returns The requested Event
