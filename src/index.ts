@@ -6,6 +6,7 @@ import { User } from './user';
 import { Auth } from './user/auth';
 
 export * from './types';
+export { Audit, Graph, User };
 
 export type EdlinkConfig = {
     version?: number;

@@ -1,13 +1,4 @@
-import {
-    Actor,
-    AuditEvent,
-    BearerTokenAPI,
-    Context,
-    RequestOptionsGet,
-    RequestOptionsPost,
-    Target,
-    UUID
-} from '../types';
+import { AuditEvent, BearerTokenAPI, CreateAuditEvent, RequestOptionsGet, RequestOptionsPost } from '../types';
 
 export class AuditEvents {
     constructor(private api: BearerTokenAPI) {
@@ -31,18 +22,18 @@ export class AuditEvents {
      * @param options Optional request options
      * @returns The recorded Event's assigned ID
      */
+    create(event: CreateAuditEvent, options?: RequestOptionsPost): Promise<Pick<AuditEvent, 'id'>>;
+    /**
+     * Records a batch of Events (1–100). The request is atomic: any validation failure rejects the entire batch.
+     * @param events The Event bodies to record
+     * @param options Optional request options
+     * @returns The recorded Events' assigned IDs, in the same order as the request
+     */
+    create(events: CreateAuditEvent[], options?: RequestOptionsPost): Promise<{ ids: string[] }>;
     create(
-        event: {
-            actor: Actor;
-            action: string;
-            targets: Target[];
-            scope: string;
-            institution?: UUID;
-            context?: Context;
-            data?: any;
-        },
+        event: CreateAuditEvent | CreateAuditEvent[],
         options: RequestOptionsPost = {}
-    ): Promise<Pick<AuditEvent, 'id'>> {
+    ): Promise<Pick<AuditEvent, 'id'> | { ids: string[] }> {
         return this.api.request(
             {
                 url: '/events',

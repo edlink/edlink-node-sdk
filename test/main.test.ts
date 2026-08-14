@@ -14,6 +14,7 @@ import {
     ApplicationTokenSet,
     Agent,
     PersonTokenSet,
+    AuditEventSeverity,
 } from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;
@@ -490,6 +491,75 @@ if (process.env.APPLICATION_SECRET_KEY) {
             expect(Array.isArray(event.targets)).toBe(true);
             expect(event.scope).toBeDefined();
             expect(event.created_date).toBeDefined();
+        });
+
+        it('POST /api/v2/audit/events batch', async () => {
+            const result = await edlink.use(application_token_set).events.create([
+                {
+                    actor: {
+                        type: 'person',
+                        identifiers: [{ value: 'test_user_1', issuer: 'test' }]
+                    },
+                    action: 'user.login',
+                    targets: [
+                        { type: 'session', identifiers: [{ value: 'session_batch_1', issuer: 'test' }] }
+                    ],
+                    scope: process.env.AUDIT_SCOPE_ID!,
+                    data: { batch_index: 0 }
+                },
+                {
+                    actor: {
+                        type: 'person',
+                        identifiers: [{ value: 'test_user_1', issuer: 'test' }]
+                    },
+                    action: 'user.login',
+                    targets: [
+                        { type: 'session', identifiers: [{ value: 'session_batch_2', issuer: 'test' }] }
+                    ],
+                    scope: process.env.AUDIT_SCOPE_ID!,
+                    data: { batch_index: 1 }
+                }
+            ]);
+            expect(result).toBeDefined();
+            expect(result.ids).toBeDefined();
+            expect(result.ids).toHaveLength(2);
+            await new Promise((r) => setTimeout(r, 3000));
+            const event = await edlink.use(application_token_set).events.fetch(result.ids[0]);
+            expect(event.id).toBe(result.ids[0]);
+            expect(event.action).toBe('user.login');
+        });
+
+        it('POST /api/v2/audit/events with severity, created_date, and before/after', async () => {
+            const created = new Date();
+            const result = await edlink.use(application_token_set).events.create({
+                actor: {
+                    type: 'person',
+                    identifiers: [{ value: 'test_user_1', issuer: 'test' }]
+                },
+                action: 'user.update',
+                targets: [
+                    { type: 'user', identifiers: [{ value: 'test_user_1', issuer: 'test' }] }
+                ],
+                scope: process.env.AUDIT_SCOPE_ID!,
+                severity: AuditEventSeverity.High,
+                created_date: created,
+                before: { name: 'Ada' },
+                after: { name: 'Ada Lovelace' }
+            });
+            expect(result).toBeDefined();
+            expect(result.id).toBeDefined();
+            await new Promise((r) => setTimeout(r, 3000));
+            const event = await edlink.use(application_token_set).events.fetch(result.id!);
+            expect(event.id).toBe(result.id);
+            expect(event.severity).toBe(AuditEventSeverity.High);
+            expect(event.created_date).toBeDefined();
+            expect(new Date(event.created_date!).toISOString()).toBe(created.toISOString());
+            expect('before' in event).toBe(true);
+            expect('after' in event).toBe(true);
+            if ('before' in event) {
+                expect(event.before).toEqual({ name: 'Ada' });
+                expect(event.after).toEqual({ name: 'Ada Lovelace' });
+            }
         });
     });
 } else {
