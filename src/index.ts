@@ -8,11 +8,19 @@ import { Auth } from './user/auth';
 export * from './types';
 export { Audit, Graph, User };
 
+const DEFAULT_EDLINK_URL = 'https://ed.link';
+
 export type EdlinkConfig = {
     version?: number;
     client_id: string;
     client_secret: string;
     log_level?: 'debug' | 'silent';
+    /**
+     * Optional Edlink origin for this instance, e.g. `https://staging.ed.link` or `http://127.0.0.1:8787`.
+     * First non-empty value wins: this field, then `ALTERNATE_EDLINK_URL`, then `https://ed.link`.
+     * A trailing slash is stripped. Graph, User, Audit, login, token exchange, and `up()` all use the result.
+     */
+    base_url?: string;
 };
 
 export class Edlink {
@@ -20,6 +28,10 @@ export class Edlink {
     client_id: string;
     client_secret: string;
     log_level: 'debug' | 'silent' = 'debug';
+    /**
+     * Resolved origin after applying `base_url`, `ALTERNATE_EDLINK_URL`, and the public default.
+     */
+    readonly base_url: string;
 
     public auth: Auth;
 
@@ -30,6 +42,7 @@ export class Edlink {
         this.client_id = config.client_id;
         this.client_secret = config.client_secret;
         this.log_level = config.log_level ?? 'debug';
+        this.base_url = (config.base_url || process.env.ALTERNATE_EDLINK_URL || DEFAULT_EDLINK_URL).replace(/\/$/, '');
         // Build API interfaces
         this.auth = new Auth(this);
     }
@@ -73,10 +86,21 @@ export class Edlink {
     }
 
     /**
+     * Check the status of this instance's Edlink API
+     */
+    async up() {
+        return Edlink.check(this.base_url);
+    }
+
+    /**
      * Check the status of the Edlink API
      */
     static async up() {
-        const response = await fetch('https://ed.link/api/up');
+        return Edlink.check((process.env.ALTERNATE_EDLINK_URL || DEFAULT_EDLINK_URL).replace(/\/$/, ''));
+    }
+
+    private static async check(base_url: string) {
+        const response = await fetch(`${base_url}/api/up`);
         if (!response.ok) {
             throw new Error('Edlink API is down.');
         } else {
@@ -95,6 +119,6 @@ export class Edlink {
             redirect_uri: redirect_uri,
             state: state
         };
-        return `https://ed.link/sso/login?${serialize(params)}`;
+        return `${this.base_url}/sso/login?${serialize(params)}`;
     }
 }

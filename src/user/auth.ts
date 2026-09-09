@@ -1,10 +1,15 @@
-import { EdlinkConfig } from '..';
 import { PersonTokenSet, TokenSetType } from '../types';
 
-export class Auth {
-    private config: EdlinkConfig;
+type AuthHost = {
+    client_id: string;
+    client_secret: string;
+    base_url: string;
+};
 
-    constructor(config: EdlinkConfig) {
+export class Auth {
+    private config: AuthHost;
+
+    constructor(config: AuthHost) {
         this.config = config;
     }
 
@@ -17,7 +22,7 @@ export class Auth {
             grant_type: 'authorization_code'
         };
 
-        const response = await fetch('https://ed.link/api/authentication/token', {
+        const response = await fetch(`${this.config.base_url}/api/authentication/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -49,7 +54,7 @@ export class Auth {
             grant_type: 'refresh_token'
         };
 
-        const response = await fetch('https://ed.link/api/authentication/token', {
+        const response = await fetch(`${this.config.base_url}/api/authentication/token`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
