@@ -3,8 +3,6 @@ import { Edlink } from '..';
 import { deepDefaults } from '../utils';
 import { RequestOptions, TokenSet, TokenSetType } from './common';
 
-const EDLINK_URL = process.env.ALTERNATE_EDLINK_URL ?? 'https://ed.link';
-
 export type RequestConfig = {
     url: string;
     method: string;
@@ -70,7 +68,7 @@ export class BearerTokenAPI {
         // Set url
         const formattedUrl = new URL(url.startsWith('http')
         ? url
-        : `${EDLINK_URL}/api/v${this.version}/${this.api}${url}`);
+        : `${this.edlink.base_url}/api/v${this.version}/${this.api}${url}`);
 
         // Add formatted options to the URL
         for (const [key, value] of Object.entries(formatted_options)) {
