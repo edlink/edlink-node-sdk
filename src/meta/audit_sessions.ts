@@ -2,7 +2,7 @@ import { AuditLogSession, BearerTokenAPI } from '../types';
 
 export class AuditSessions {
     constructor(private api: BearerTokenAPI) {
-        if (api.api !== 'audit') {
+        if (api.api !== 'meta') {
             throw new Error('The Audit Logs API only works with the Application TokenSetType');
         }
     }
@@ -14,7 +14,7 @@ export class AuditSessions {
      */
     create(scope: string): Promise<AuditLogSession> {
         return this.api.request({
-            url: '/sessions',
+            url: '/audit/sessions',
             method: 'POST',
             data: {
                 scope

@@ -10,14 +10,24 @@ export type RequestConfig = {
     method: string;
     headers?: Record<string, string>;
     data?: any;
-}
+};
 
 class EdlinkError extends Error {
     status?: number;
     code?: string;
     errors: any[];
 
-    constructor({ message, status, code, errors = [] }: { message: string; status: number; code?: string; errors?: any[] }) {
+    constructor({
+        message,
+        status,
+        code,
+        errors = []
+    }: {
+        message: string;
+        status: number;
+        code?: string;
+        errors?: any[];
+    }) {
         super(message);
         this.status = status;
         this.code = code;
@@ -28,32 +38,28 @@ class EdlinkError extends Error {
 export class BearerTokenAPI {
     private token_set: TokenSet;
     private version: number;
-    public api: 'graph' | 'my' | 'audit';
+    public api: 'graph' | 'my' | 'meta';
     public edlink: Edlink;
 
     constructor(edlink: Edlink, token_set: TokenSet) {
         // Assign config
         this.token_set = token_set;
         this.version = edlink.version;
-        this.api = 'graph';// default for TokenSetType.Integration
+        this.api = 'graph'; // default for TokenSetType.Integration
         if (token_set.type === TokenSetType.Application) {
-          this.api = 'audit';
+            this.api = 'meta';
         } else if (token_set.type === TokenSetType.Person) {
-          this.api = 'my';
+            this.api = 'my';
         }
         this.edlink = edlink;
     }
 
-    async request<T>(
-        config: string | RequestConfig,
-        options: RequestOptions = {},
-        raw = false
-    ): Promise<T> {
+    async request<T>(config: string | RequestConfig, options: RequestOptions = {}, raw = false): Promise<T> {
         const defaults: Record<string, any> = {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                Accept: 'application/json',
+                Accept: 'application/json'
             }
         };
         let req: Request;
@@ -68,9 +74,11 @@ export class BearerTokenAPI {
         }
 
         // Set url
-        const formattedUrl = new URL(url.startsWith('http')
-        ? url
-        : `${EDLINK_URL}/api/v${this.version}/${this.api}${url}`);
+        const formattedUrl = new URL(
+            url.startsWith('http')
+                ? url
+                : `${EDLINK_URL}/api/v${this.version}/${this.api === 'meta' ? '' : this.api}${url}`
+        );
 
         // Add formatted options to the URL
         for (const [key, value] of Object.entries(formatted_options)) {
@@ -99,9 +107,14 @@ export class BearerTokenAPI {
         }
 
         // Check if the token needs to be refreshed if this is a person token set.
-        if (this.token_set.type === TokenSetType.Person && this.token_set.refresh_token && this.requiresTokenRefresh()) {
+        if (
+            this.token_set.type === TokenSetType.Person &&
+            this.token_set.refresh_token &&
+            this.requiresTokenRefresh()
+        ) {
             // do the token refresh
-            const { access_token, refresh_token } = await this.edlink.auth.refresh(this.token_set.refresh_token!)
+            const { access_token, refresh_token } = await this.edlink.auth
+                .refresh(this.token_set.refresh_token!)
                 .catch(() => {
                     throw new EdlinkError({
                         message: 'Failed to refresh token.',
@@ -139,7 +152,7 @@ export class BearerTokenAPI {
                 errors: data.$errors.slice(1)
             });
         }
-        
+
         return raw ? data : data.$data;
     }
 
@@ -162,11 +175,7 @@ export class BearerTokenAPI {
                 }
             }
 
-            const response: { $data: T[]; $next?: string } = await this.request(
-                config,
-                options,
-                true
-            );
+            const response: { $data: T[]; $next?: string } = await this.request(config, options, true);
             next = response.$next;
             data = response.$data;
             for (const item of data) {
@@ -199,7 +208,7 @@ export class BearerTokenAPI {
 
         return current_date > expiration_date;
     }
-    
+
     public formatParams(params: RequestOptions): Record<string, any> {
         const formatted: {
             $idempotency?: string;
@@ -207,13 +216,13 @@ export class BearerTokenAPI {
             $expand?: string;
             $properties?: string;
         } & Record<string, any> = {};
-    
+
         const mappings: Record<string, string | { prop: string; mod: (value: any) => any }> = {
             idempotency: '$idempotency',
             filter: { prop: '$filter', mod: JSON.stringify },
             properties: { prop: '$properties', mod: (value: string[]) => value.join(',') },
-            expand: { prop: '$expand', mod: (value: string[]) => value.join(',') },
-        }
+            expand: { prop: '$expand', mod: (value: string[]) => value.join(',') }
+        };
 
         for (const [key, value] of Object.entries(params)) {
             const mapping = mappings[key];

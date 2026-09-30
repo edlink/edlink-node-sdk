@@ -2,7 +2,7 @@ import { AuditEvent, BearerTokenAPI, CreateAuditEvent, RequestOptionsGet, Reques
 
 export class AuditEvents {
     constructor(private api: BearerTokenAPI) {
-        if (api.api !== 'audit') {
+        if (api.api !== 'meta') {
             throw new Error('The Audit Logs API only works with the Application TokenSetType');
         }
     }
@@ -13,7 +13,7 @@ export class AuditEvents {
      * @returns The requested Event
      */
     fetch(event_id: string, options: RequestOptionsGet = {}): Promise<AuditEvent> {
-        return this.api.request(`/events/${event_id}`, options);
+        return this.api.request(`/audit/events/${event_id}`, options);
     }
 
     /**
@@ -36,7 +36,7 @@ export class AuditEvents {
     ): Promise<Pick<AuditEvent, 'id'> | { ids: string[] }> {
         return this.api.request(
             {
-                url: '/events',
+                url: '/audit/events',
                 method: 'POST',
                 data: event
             },
