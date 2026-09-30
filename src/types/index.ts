@@ -1,5 +1,6 @@
 export * from './api';
 export * from './audit_event';
+export * from './audit_session';
 export * from './common';
 export * from './address';
 export * from './agent';

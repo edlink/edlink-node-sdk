@@ -1,6 +1,19 @@
 import { Edlink } from '..';
 import { BearerTokenAPI, TokenSet } from '../types';
-import { Agents, Classes, Courses, Districts, Enrollments, People, Schools, Sections, Sessions, Licenses, Categories } from '../common';
+import {
+    Agents,
+    Assignments,
+    Classes,
+    Courses,
+    Districts,
+    Enrollments,
+    People,
+    Schools,
+    Sections,
+    Sessions,
+    Licenses,
+    Categories
+} from '../common';
 
 export class Graph extends BearerTokenAPI {
     public districts: Districts;
@@ -9,6 +22,7 @@ export class Graph extends BearerTokenAPI {
     public courses: Courses;
     public classes: Classes;
     public categories: Categories;
+    public assignments: Assignments;
     public sections: Sections;
     public people: People;
     public enrollments: Enrollments;
@@ -26,6 +40,7 @@ export class Graph extends BearerTokenAPI {
         this.courses = new Courses(this);
         this.classes = new Classes(this);
         this.categories = new Categories(this);
+        this.assignments = new Assignments(this);
         this.sections = new Sections(this);
         this.people = new People(this);
         this.enrollments = new Enrollments(this);

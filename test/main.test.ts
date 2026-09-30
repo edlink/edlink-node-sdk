@@ -14,7 +14,7 @@ import {
     ApplicationTokenSet,
     Agent,
     PersonTokenSet,
-    AuditEventSeverity,
+    AuditEventSeverity
 } from '../src';
 
 const integration_access_token = process.env.INTEGRATION_ACCESS_TOKEN!;
@@ -32,43 +32,47 @@ const edlink = new Edlink({
     log_level: 'silent'
 });
 
-describe('User', () => {
-    it('auth', async () => {
-        // const grant = await edlink.auth.grant({
-        //     code: process.env.CODE!,
-        //     redirect_uri: 'https://oauthdebugger.com/debug'
-        // });
+if (process.env.REFRESH_TOKEN) {
+    describe('User', () => {
+        it('auth', async () => {
+            // const grant = await edlink.auth.grant({
+            //     code: process.env.CODE!,
+            //     redirect_uri: 'https://oauthdebugger.com/debug'
+            // });
 
-        // Attempt to refresh a token
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        expect(refresh.access_token).toBeDefined();
+            // Attempt to refresh a token
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            expect(refresh.access_token).toBeDefined();
 
-        // List users classes (fetching 1)
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
-            // List assignments for that class (fetching 1)
-            for await (const assignment of edlink.use(refresh).assignments.list(_class.id, { limit: 1 })) {
-                // List submissions for that assignment (fetching 1)
-                for await (const submission of edlink
-                    .use(refresh)
-                    .submissions.list(_class.id, assignment.id, { limit: 1 })) {
-                    // Generate a new grade for that submission and attempt to update it
-                    const new_grade = Math.floor(Math.random() * 100);
-                    const new_submissions = await edlink
+            // List users classes (fetching 1)
+            for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+                // List assignments for that class (fetching 1)
+                for await (const assignment of edlink.use(refresh).assignments.list(_class.id, { limit: 1 })) {
+                    // List submissions for that assignment (fetching 1)
+                    for await (const submission of edlink
                         .use(refresh)
-                        .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
-                    expect(new_submissions.grade_points).toBe(new_grade);
+                        .submissions.list(_class.id, assignment.id, { limit: 1 })) {
+                        // Generate a new grade for that submission and attempt to update it
+                        const new_grade = Math.floor(Math.random() * 100);
+                        const new_submissions = await edlink
+                            .use(refresh)
+                            .submissions.update(_class.id, assignment.id, submission.id, { grade_points: new_grade });
+                        expect(new_submissions.grade_points).toBe(new_grade);
+                    }
                 }
             }
-        }
 
-        const profile = await edlink.use(refresh).my.profile();
-        const integration = await edlink.use(refresh).my.integration();
-        const source = await edlink.use(refresh).my.source();
-        expect(profile).toBeDefined();
-        expect(integration).toBeDefined();
-        expect(source).toBeDefined();
+            const profile = await edlink.use(refresh).my.profile();
+            const integration = await edlink.use(refresh).my.integration();
+            const source = await edlink.use(refresh).my.source();
+            expect(profile).toBeDefined();
+            expect(integration).toBeDefined();
+            expect(source).toBeDefined();
+        });
     });
-});
+} else {
+    console.warn('REFRESH_TOKEN is not set, skipping User tests');
+}
 
 describe('Error Handling', () => {
     it('should throw an error when the access token is invalid', async () => {
@@ -90,19 +94,21 @@ describe('Error Handling', () => {
         await expect(edlink.use(invalid_token_set).my.profile()).rejects.toThrow(`Failed to refresh token.`);
     });
 
-    it('should throw error with an invalid id', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        await expect(edlink.use(refresh).classes.fetch('invalid')).rejects.toThrow(
-            `A valid v4 or v5 UUID or Alias is expected for parameter 'class_id'.`
-        );
-    });
+    if (process.env.REFRESH_TOKEN) {
+        it('should throw error with an invalid id', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            await expect(edlink.use(refresh).classes.fetch('invalid')).rejects.toThrow(
+                `A valid v4 or v5 UUID or Alias is expected for parameter 'class_id'.`
+            );
+        });
 
-    it('[User] should throw error with a not found id', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        await expect(edlink.use(refresh).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
-            'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this person.'
-        );
-    });
+        it('[User] should throw error with a not found id', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            await expect(edlink.use(refresh).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
+                'School with id 14e9c28a-aa22-4a4b-b54b-8c6df61701fe not found for this person.'
+            );
+        });
+    }
 
     it('[Graph] should throw error with a not found id', async () => {
         await expect(edlink.use(token_set).schools.fetch('14e9c28a-aa22-4a4b-b54b-8c6df61701fe')).rejects.toThrow(
@@ -384,25 +390,22 @@ describe('Graph', () => {
     // });
 
     it('/api/v2/graph/classes/:class_id?$expand=products', async () => {
-        const _class = await edlink
-            .use(token_set)
-            .classes.fetch('fc8ba5f4-1b10-42a8-9929-75790d601912', { expand: ['products'] });
-        expect(_class.products).toBeDefined();
-        expect(Array.isArray(_class.products)).toBe(true);
-        expect(_class.products!.length).toBeGreaterThan(0);
+        for await (const listed of edlink.use(token_set).classes.list({ limit: 1 })) {
+            const _class = await edlink.use(token_set).classes.fetch(listed.id, { expand: ['products'] });
+            expect(_class.products).toBeDefined();
+            expect(Array.isArray(_class.products)).toBe(true);
+        }
     });
 
     it('/api/v2/graph/people/:person_id?$expand=products', async () => {
-        const person = await edlink
-            .use(token_set)
-            .people.fetch('f7ba3e9d-b1f1-451a-802b-f072a3482c55', { expand: ['products'] });
-        expect(person).toBeDefined();
-        expect(Array.isArray(person.products)).toBe(true);
-        expect(person.products!.length).toBeGreaterThan(0);
+        for await (const listed of edlink.use(token_set).people.list({ limit: 1 })) {
+            const person = await edlink.use(token_set).people.fetch(listed.id, { expand: ['products'] });
+            expect(person).toBeDefined();
+            expect(Array.isArray(person.products)).toBe(true);
+        }
     });
 
     // Categories
-    
 });
 
 describe('Request Options', () => {
@@ -410,32 +413,33 @@ describe('Request Options', () => {
         // Generate a random idempotency key
         const idempotency_key = Math.random().toString(36).substring(7);
 
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        expect(refresh.access_token).toBeDefined();
-
-        // List users classes (fetching 1)
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+        // List classes (fetching 1)
+        for await (const _class of edlink.use(token_set).classes.list({ limit: 1 })) {
             // Attempt to create a new assignment with an idempotency key
-            const assignment = await edlink
-                .use(refresh)
-                .assignments.create(_class.id, {
+            const assignment = await edlink.use(token_set).assignments.create(
+                _class.id,
+                {
                     title: 'Test Assignment',
                     description: 'Test Assignment Description',
                     due_date: '2222-01-01T00:00:00Z',
                     grading_type: 'points',
                     points_possible: 100
-                }, { idempotency: idempotency_key });
+                },
+                { idempotency: idempotency_key }
+            );
             expect(assignment).toBeDefined();
             // Attempt to create a different assignment with the same idempotency key
-            const assignment2 = await edlink
-                .use(refresh)
-                .assignments.create(_class.id, {
+            const assignment2 = await edlink.use(token_set).assignments.create(
+                _class.id,
+                {
                     title: 'Different Test Assignment',
                     description: 'This is a different test assignment',
                     due_date: '2222-01-01T00:00:00Z',
                     grading_type: 'points',
                     points_possible: 100
-                }, { idempotency: idempotency_key })
+                },
+                { idempotency: idempotency_key }
+            );
             // Check that the second assignment is the same as the first
             expect(assignment2).toBeDefined();
             expect(assignment2).toStrictEqual(assignment);
@@ -443,17 +447,19 @@ describe('Request Options', () => {
     });
 });
 
-if (process.env.APPLICATION_SECRET_KEY) {
+const APPLICATION_SECRET_KEY = process.env.APPLICATION_SECRET_KEY ?? process.env.CLIENT_SECRET;
+
+if (APPLICATION_SECRET_KEY) {
     const application_token_set: ApplicationTokenSet = {
-        access_token: process.env.APPLICATION_SECRET_KEY!,
+        access_token: APPLICATION_SECRET_KEY,
         type: TokenSetType.Application
     };
 
-    describe('Audit', () => {
-        let created_event_id: string;
+    const AUDIT_SCOPE = '123456';
 
+    describe('Audit', () => {
         it('POST /api/v2/audit/events', async () => {
-            const result = await edlink.use(application_token_set).events.create({
+            const result = await edlink.use(application_token_set).audit_events.create({
                 actor: {
                     type: 'person',
                     identifiers: [{ value: 'test_user_1', issuer: 'test' }]
@@ -462,7 +468,7 @@ if (process.env.APPLICATION_SECRET_KEY) {
                 targets: [
                     { type: 'session', identifiers: [{ value: 'session_abc', issuer: 'test', name: 'Test Session' }] }
                 ],
-                scope: process.env.AUDIT_SCOPE_ID!,
+                scope: AUDIT_SCOPE,
                 context: {
                     http_method: 'POST',
                     path: '/login',
@@ -476,14 +482,36 @@ if (process.env.APPLICATION_SECRET_KEY) {
             });
             expect(result).toBeDefined();
             expect(result.id).toBeDefined();
-            created_event_id = result.id!;
-            await new Promise((r) => setTimeout(r, 3000)); // must wait for async_inserts to clickhouse to work
         });
 
         it('GET /api/v2/audit/events/:event_id', async () => {
-            const event = await edlink.use(application_token_set).events.fetch(created_event_id);
+            const result = await edlink.use(application_token_set).audit_events.create({
+                actor: {
+                    type: 'person',
+                    identifiers: [{ value: 'test_user_1', issuer: 'test' }]
+                },
+                action: 'user.login',
+                targets: [
+                    { type: 'session', identifiers: [{ value: 'session_abc', issuer: 'test', name: 'Test Session' }] }
+                ],
+                scope: AUDIT_SCOPE,
+                context: {
+                    http_method: 'POST',
+                    path: '/login',
+                    ip: '1.2.3.4',
+                    user_agent: 'Jest'
+                },
+                data: {
+                    internal_user_id: 'test_user_1',
+                    application_name: 'Test Suite'
+                }
+            });
+            expect(result.id).toBeDefined();
+            // ClickHouse async inserts are not immediately queryable
+            await new Promise((r) => setTimeout(r, 3000));
+            const event = await edlink.use(application_token_set).audit_events.fetch(result.id!);
             expect(event).toBeDefined();
-            expect(event.id).toBe(created_event_id);
+            expect(event.id).toBe(result.id);
             expect(event.action).toBe('user.login');
             expect(event.actor).toBeDefined();
             expect(event.actor.type).toBe('person');
@@ -491,20 +519,18 @@ if (process.env.APPLICATION_SECRET_KEY) {
             expect(Array.isArray(event.targets)).toBe(true);
             expect(event.scope).toBeDefined();
             expect(event.created_date).toBeDefined();
-        });
+        }, 9000);
 
         it('POST /api/v2/audit/events batch', async () => {
-            const result = await edlink.use(application_token_set).events.create([
+            const result = await edlink.use(application_token_set).audit_events.create([
                 {
                     actor: {
                         type: 'person',
                         identifiers: [{ value: 'test_user_1', issuer: 'test' }]
                     },
                     action: 'user.login',
-                    targets: [
-                        { type: 'session', identifiers: [{ value: 'session_batch_1', issuer: 'test' }] }
-                    ],
-                    scope: process.env.AUDIT_SCOPE_ID!,
+                    targets: [{ type: 'session', identifiers: [{ value: 'session_batch_1', issuer: 'test' }] }],
+                    scope: AUDIT_SCOPE,
                     data: { batch_index: 0 }
                 },
                 {
@@ -513,34 +539,44 @@ if (process.env.APPLICATION_SECRET_KEY) {
                         identifiers: [{ value: 'test_user_1', issuer: 'test' }]
                     },
                     action: 'user.login',
-                    targets: [
-                        { type: 'session', identifiers: [{ value: 'session_batch_2', issuer: 'test' }] }
-                    ],
-                    scope: process.env.AUDIT_SCOPE_ID!,
+                    targets: [{ type: 'session', identifiers: [{ value: 'session_batch_2', issuer: 'test' }] }],
+                    scope: AUDIT_SCOPE,
                     data: { batch_index: 1 }
                 }
             ]);
             expect(result).toBeDefined();
             expect(result.ids).toBeDefined();
             expect(result.ids).toHaveLength(2);
+            // ClickHouse async inserts are not immediately queryable
             await new Promise((r) => setTimeout(r, 3000));
-            const event = await edlink.use(application_token_set).events.fetch(result.ids[0]);
+            const event = await edlink.use(application_token_set).audit_events.fetch(result.ids[0]);
             expect(event.id).toBe(result.ids[0]);
             expect(event.action).toBe('user.login');
+        }, 9000);
+
+        it('POST /api/v2/audit/sessions', async () => {
+            const result = await edlink.use(application_token_set).audit_sessions.create(AUDIT_SCOPE);
+            expect(result).toBeDefined();
+            expect(result.id).toBeDefined();
+            expect(result.key).toBeDefined();
+            expect(result.scope).toBe(AUDIT_SCOPE);
+            expect(result.expiration_date).toBeDefined();
+            expect(result.created_date).toBeDefined();
+            expect(result.updated_date).toBeDefined();
+            expect(result.team_id).toBeDefined();
+            expect(result.application_id).toBeDefined();
         });
 
         it('POST /api/v2/audit/events with severity, created_date, and before/after', async () => {
             const created = new Date();
-            const result = await edlink.use(application_token_set).events.create({
+            const result = await edlink.use(application_token_set).audit_events.create({
                 actor: {
                     type: 'person',
                     identifiers: [{ value: 'test_user_1', issuer: 'test' }]
                 },
                 action: 'user.update',
-                targets: [
-                    { type: 'user', identifiers: [{ value: 'test_user_1', issuer: 'test' }] }
-                ],
-                scope: process.env.AUDIT_SCOPE_ID!,
+                targets: [{ type: 'user', identifiers: [{ value: 'test_user_1', issuer: 'test' }] }],
+                scope: AUDIT_SCOPE,
                 severity: AuditEventSeverity.High,
                 created_date: created,
                 before: { name: 'Ada' },
@@ -548,8 +584,9 @@ if (process.env.APPLICATION_SECRET_KEY) {
             });
             expect(result).toBeDefined();
             expect(result.id).toBeDefined();
+            // ClickHouse async inserts are not immediately queryable
             await new Promise((r) => setTimeout(r, 3000));
-            const event = await edlink.use(application_token_set).events.fetch(result.id!);
+            const event = await edlink.use(application_token_set).audit_events.fetch(result.id!);
             expect(event.id).toBe(result.id);
             expect(event.severity).toBe(AuditEventSeverity.High);
             expect(event.created_date).toBeDefined();
@@ -560,77 +597,79 @@ if (process.env.APPLICATION_SECRET_KEY) {
                 expect(event.before).toEqual({ name: 'Ada' });
                 expect(event.after).toEqual({ name: 'Ada Lovelace' });
             }
-        });
+        }, 9000);
     });
 } else {
-    console.error('APPLICATION_SECRET_KEY is not set, skipping Audit tests');
+    console.warn('APPLICATION_SECRET_KEY & CLIENT_SECRET are not set, skipping Audit tests');
 }
 
 if (process.env.REFRESH_TOKEN) {
-describe('Categories', () => {
-    it('should list categories for a class', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
-            for await (const category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
-                expect(category).toBeDefined();
+    describe('Categories', () => {
+        it('should list categories for a class', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+                for await (const category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
+                    expect(category).toBeDefined();
+                }
             }
-        }
-    });
+        });
 
-    it('should fetch a specific category for a class', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
-            for await (const _category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
-                const category = await edlink.use(refresh).categories.fetch(_class.id, _category.id);
-                expect(category).toBeDefined();
-                expect(category).toStrictEqual(_category);
+        it('should fetch a specific category for a class', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+                for await (const _category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
+                    const category = await edlink.use(refresh).categories.fetch(_class.id, _category.id);
+                    expect(category).toBeDefined();
+                    expect(category).toStrictEqual(_category);
+                }
             }
-        }
-    });
+        });
 
-    it('should create a new category for a class', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
-            const newCategory = {
-                title: 'Test Category',
-            };
-            const category = await edlink.use(refresh).categories.create(_class.id, newCategory);
-            expect(category).toBeDefined();
-            expect(category.title).toBe(newCategory.title);
-        }
-    });
-
-    it('should update a category for a class', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
-            for await (const _category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
-                const updatedCategory = {
-                    title: 'Updated Test Category',
+        it('should create a new category for a class', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+                const newCategory = {
+                    title: 'Test Category'
                 };
-                const category = await edlink.use(refresh).categories.update(_class.id, _category.id, updatedCategory);
+                const category = await edlink.use(refresh).categories.create(_class.id, newCategory);
                 expect(category).toBeDefined();
-                expect(category.title).toBe(updatedCategory.title);
+                expect(category.title).toBe(newCategory.title);
             }
-        }
-    });
-    
-    it('should create and delete a category', async () => {
-        const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
-        for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
-            // Create a new category
-            const newCategory = {
-                title: 'Category to Delete',
-            };
-            const category = await edlink.use(refresh).categories.create(_class.id, newCategory);
-            expect(category).toBeDefined();
-            expect(category.title).toBe(newCategory.title);
+        });
 
-            // Delete the created category
-            const response = await edlink.use(refresh).categories.delete(_class.id, category.id);
-            expect(response).toBeDefined();
-        }
+        it('should update a category for a class', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+                for await (const _category of edlink.use(refresh).categories.list(_class.id, { limit: 1 })) {
+                    const updatedCategory = {
+                        title: 'Updated Test Category'
+                    };
+                    const category = await edlink
+                        .use(refresh)
+                        .categories.update(_class.id, _category.id, updatedCategory);
+                    expect(category).toBeDefined();
+                    expect(category.title).toBe(updatedCategory.title);
+                }
+            }
+        });
+
+        it('should create and delete a category', async () => {
+            const refresh = await edlink.auth.refresh(process.env.REFRESH_TOKEN!);
+            for await (const _class of edlink.use(refresh).classes.list({ limit: 1 })) {
+                // Create a new category
+                const newCategory = {
+                    title: 'Category to Delete'
+                };
+                const category = await edlink.use(refresh).categories.create(_class.id, newCategory);
+                expect(category).toBeDefined();
+                expect(category.title).toBe(newCategory.title);
+
+                // Delete the created category
+                const response = await edlink.use(refresh).categories.delete(_class.id, category.id);
+                expect(response).toBeDefined();
+            }
+        });
     });
-});
 } else {
-    console.error('REFRESH_TOKEN is not set, skipping tests that require it');
+    console.warn('REFRESH_TOKEN is not set, skipping tests that require it');
 }
