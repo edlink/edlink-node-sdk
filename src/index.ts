@@ -1,12 +1,12 @@
 import { serialize } from './common';
-import { Audit } from './audit';
+import { Meta } from './meta';
 import { Graph } from './graph';
 import { ApplicationTokenSet, IntegrationTokenSet, PersonTokenSet, TokenSetType } from './types';
 import { User } from './user';
 import { Auth } from './user/auth';
 
 export * from './types';
-export { Audit, Graph, User };
+export { Meta as Audit, Meta, Graph, User };
 
 export type EdlinkConfig = {
     version?: number;
@@ -49,18 +49,25 @@ export class Edlink {
     /**
      * Initialize an instance of the Edlink Audit API with an application token set.
      * @param token_set The ApplicationTokenSet used to authenticate the request
-     * @returns {Audit} An instance of the Edlink Audit API interface using the provided TokenSet
+     * @returns {Meta} An instance of the Edlink Audit API interface using the provided TokenSet
      */
-    public use(token_set: ApplicationTokenSet): Audit;
+    public use(token_set: ApplicationTokenSet): Meta;
 
-    public use(token_set: PersonTokenSet | IntegrationTokenSet | ApplicationTokenSet): User | Graph | Audit {
+    public use(token_set: PersonTokenSet | IntegrationTokenSet | ApplicationTokenSet): User | Graph | Meta {
         if (token_set.type === TokenSetType.Person) {
             return new User(this, token_set);
         } else if (token_set.type === TokenSetType.Application) {
-            return new Audit(this, token_set);
+            return new Meta(this, token_set);
         } else {
             return new Graph(this, token_set);
         }
+    }
+
+    get meta(): Meta {
+        return new Meta(this, {
+            type: TokenSetType.Application,
+            access_token: this.client_secret
+        });
     }
 
     private static validate(config: EdlinkConfig) {
