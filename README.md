@@ -71,7 +71,8 @@ for await (const district of edlink.use(integration_token_set).districts.list())
 ```typescript
 // Authenticate a user
 // First build your login url to provide to the user.
-// This URL doesnt change and can be hardcoded if desired
+// Against production this is always https://ed.link/sso/login and can be safely hardcoded.
+// If you set base_url or ALTERNATE_EDLINK_URL, always call loginUrl() instead of hardcoding.
 /**
  * https://ed.link/sso/login
  * ?client_id=[...]
