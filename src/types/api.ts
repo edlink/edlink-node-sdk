@@ -79,6 +79,25 @@ export class BearerTokenAPI {
 
         // Set url
         defaults.url = formattedUrl.toString();
+
+        // Check if the token needs to be refreshed if this is a person token set.
+        if (this.token_set.type === TokenSetType.Person && this.token_set.refresh_token && this.requiresTokenRefresh()) {
+            // do the token refresh
+            const { access_token, refresh_token } = await this.edlink.auth.refresh(this.token_set.refresh_token!)
+                .catch(() => {
+                    throw new EdlinkError({
+                        message: 'Failed to refresh token.',
+                        status: 400,
+                        code: 'BAD_REQUEST'
+                    });
+                });
+
+            // update the tokenset
+            this.token_set.access_token = access_token;
+            this.token_set.refresh_token = refresh_token;
+            this.token_set.expiration_date = new Date(Date.now() + 3600 * 1000);
+        }
+
         // Set access token
         defaults.headers['Authorization'] = `Bearer ${this.token_set.access_token}`;
 
@@ -98,23 +117,6 @@ export class BearerTokenAPI {
             req = new Request(config.url, config);
         }
 
-        // Check if the token needs to be refreshed if this is a person token set.
-        if (this.token_set.type === TokenSetType.Person && this.token_set.refresh_token && this.requiresTokenRefresh()) {
-            // do the token refresh
-            const { access_token, refresh_token } = await this.edlink.auth.refresh(this.token_set.refresh_token!)
-                .catch(() => {
-                    throw new EdlinkError({
-                        message: 'Failed to refresh token.',
-                        status: 400,
-                        code: 'BAD_REQUEST'
-                    });
-                });
-
-            // update the tokenset
-            this.token_set.access_token = access_token;
-            this.token_set.refresh_token = refresh_token;
-            this.token_set.expiration_date = new Date(Date.now() + 3600 * 1000);
-        }
         // Make request
         const response = await fetch(req);
         const data = await response.json();
